@@ -56,17 +56,17 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         // Extended palette
-        lime: {
-          DEFAULT: "hsl(var(--lime))",
-          soft: "hsl(var(--lime-soft))",
+        golden: {
+          DEFAULT: "hsl(var(--golden))",
+          soft: "hsl(var(--golden-soft))",
         },
-        peach: {
-          DEFAULT: "hsl(var(--peach))",
-          soft: "hsl(var(--peach-soft))",
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          soft: "hsl(var(--coral-soft))",
         },
         charcoal: "hsl(var(--charcoal))",
         cream: "hsl(var(--cream))",
-        sage: "hsl(var(--sage))",
+        lavender: "hsl(var(--lavender))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
