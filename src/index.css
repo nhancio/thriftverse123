@@ -23,21 +23,21 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    /* Primary - Electric Lime (Gen Z energy) */
-    --primary: 75 100% 50%;
+    /* Primary - Warm Golden Yellow (Gen Z energy, TikTok vibes) */
+    --primary: 45 100% 51%;
     --primary-foreground: 220 15% 10%;
 
-    /* Secondary - Soft Sage */
-    --secondary: 80 25% 92%;
+    /* Secondary - Soft Lavender */
+    --secondary: 270 30% 94%;
     --secondary-foreground: 220 15% 20%;
 
     /* Muted - Warm Gray */
     --muted: 40 15% 93%;
     --muted-foreground: 220 10% 45%;
 
-    /* Accent - Peachy Coral (warmth) */
-    --accent: 15 90% 72%;
-    --accent-foreground: 15 90% 20%;
+    /* Accent - Vibrant Coral Pink */
+    --accent: 350 85% 65%;
+    --accent-foreground: 350 85% 15%;
 
     /* Destructive */
     --destructive: 0 85% 60%;
@@ -46,18 +46,18 @@
     /* Borders & Inputs */
     --border: 40 20% 88%;
     --input: 40 20% 88%;
-    --ring: 75 100% 50%;
+    --ring: 45 100% 51%;
 
     --radius: 1rem;
 
     /* Extended palette */
-    --lime: 75 100% 50%;
-    --lime-soft: 75 70% 85%;
-    --peach: 15 90% 72%;
-    --peach-soft: 15 80% 92%;
+    --golden: 45 100% 51%;
+    --golden-soft: 45 80% 88%;
+    --coral: 350 85% 65%;
+    --coral-soft: 350 60% 92%;
     --charcoal: 220 15% 15%;
     --cream: 45 30% 97%;
-    --sage: 80 25% 75%;
+    --lavender: 270 30% 80%;
 
     /* Glass effects */
     --glass-bg: 0 0% 100%;
@@ -70,17 +70,17 @@
     --shadow-sm: 0 2px 8px hsl(220 15% 15% / 0.04);
     --shadow-md: 0 4px 16px hsl(220 15% 15% / 0.06);
     --shadow-lg: 0 8px 32px hsl(220 15% 15% / 0.08);
-    --shadow-glow: 0 0 40px hsl(75 100% 50% / 0.3);
+    --shadow-glow: 0 0 40px hsl(45 100% 51% / 0.3);
 
     /* Sidebar */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 15% 15%;
-    --sidebar-primary: 75 100% 50%;
+    --sidebar-primary: 45 100% 51%;
     --sidebar-primary-foreground: 220 15% 10%;
-    --sidebar-accent: 80 25% 92%;
+    --sidebar-accent: 270 30% 94%;
     --sidebar-accent-foreground: 220 15% 20%;
     --sidebar-border: 40 20% 88%;
-    --sidebar-ring: 75 100% 50%;
+    --sidebar-ring: 45 100% 51%;
   }
 
   .dark {
@@ -93,32 +93,32 @@
     --popover: 220 18% 12%;
     --popover-foreground: 45 20% 95%;
 
-    --primary: 75 100% 55%;
+    --primary: 45 100% 55%;
     --primary-foreground: 220 15% 8%;
 
-    --secondary: 220 15% 18%;
+    --secondary: 270 20% 20%;
     --secondary-foreground: 45 20% 90%;
 
     --muted: 220 15% 18%;
     --muted-foreground: 220 10% 60%;
 
-    --accent: 15 85% 65%;
-    --accent-foreground: 15 90% 95%;
+    --accent: 350 80% 60%;
+    --accent-foreground: 350 85% 95%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 15% 20%;
     --input: 220 15% 20%;
-    --ring: 75 100% 55%;
+    --ring: 45 100% 55%;
 
-    --lime: 75 100% 55%;
-    --lime-soft: 75 50% 25%;
-    --peach: 15 85% 65%;
-    --peach-soft: 15 40% 20%;
+    --golden: 45 100% 55%;
+    --golden-soft: 45 50% 25%;
+    --coral: 350 80% 60%;
+    --coral-soft: 350 40% 20%;
     --charcoal: 220 15% 90%;
     --cream: 220 20% 8%;
-    --sage: 80 20% 35%;
+    --lavender: 270 20% 35%;
 
     --glass-bg: 220 18% 15%;
     --glass-bg-opacity: 0.8;
@@ -128,16 +128,16 @@
     --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.2);
     --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.25);
     --shadow-lg: 0 8px 32px hsl(0 0% 0% / 0.3);
-    --shadow-glow: 0 0 40px hsl(75 100% 55% / 0.2);
+    --shadow-glow: 0 0 40px hsl(45 100% 55% / 0.2);
 
     --sidebar-background: 220 18% 10%;
     --sidebar-foreground: 45 20% 95%;
-    --sidebar-primary: 75 100% 55%;
+    --sidebar-primary: 45 100% 55%;
     --sidebar-primary-foreground: 220 15% 8%;
-    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent: 270 20% 20%;
     --sidebar-accent-foreground: 45 20% 90%;
     --sidebar-border: 220 15% 20%;
-    --sidebar-ring: 75 100% 55%;
+    --sidebar-ring: 45 100% 55%;
   }
 }
 
@@ -163,7 +163,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary via-lime to-accent bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary via-golden to-accent bg-clip-text text-transparent;
   }
 
   /* Hover lift effect */
@@ -186,11 +186,11 @@
   }
 
   .badge-like-new {
-    @apply bg-sage/30 text-foreground border border-sage/40;
+    @apply bg-lavender/30 text-foreground border border-lavender/40;
   }
 
   .badge-gently-used {
-    @apply bg-peach-soft text-accent-foreground border border-accent/30;
+    @apply bg-coral-soft text-accent-foreground border border-accent/30;
   }
 
   /* Feed item card */

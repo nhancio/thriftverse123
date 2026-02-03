@@ -25,8 +25,8 @@ export function Header() {
               whileHover={{ rotate: -5, scale: 1.05 }}
               className="text-2xl font-display font-bold tracking-tight"
             >
-              <span className="text-primary">thrift</span>
-              <span className="text-foreground">ed</span>
+              <span className="text-primary">Thrift</span>
+              <span className="text-foreground">Verse</span>
             </motion.div>
           </Link>
 
