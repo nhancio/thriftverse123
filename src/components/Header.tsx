@@ -13,7 +13,6 @@ export function Header() {
 
   const navLinks = [
     { href: "/browse", label: "Shop" },
-    { href: "/sell", label: "Sell" },
     { href: "/collections", label: "Collections" },
   ];
 
@@ -36,16 +35,16 @@ export function Header() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
+                  "px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300",
                   location.pathname === link.href
-                    ? "text-primary"
-                    : "text-muted-foreground"
+                    ? "bg-primary text-primary-foreground shadow-glow"
+                    : "bg-muted/50 text-foreground hover:bg-primary/10 hover:text-primary"
                 )}
               >
                 {link.label}
