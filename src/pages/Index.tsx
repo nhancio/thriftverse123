@@ -14,14 +14,14 @@ const Index = () => {
       <Categories />
 
       {/* Contact Us */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 sm:py-12 md:py-24">
         <div className="container">
-          <div className="text-center py-12 px-6 rounded-3xl bg-foreground text-background">
-            <Phone className="w-10 h-10 mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl md:text-3xl font-display font-bold mb-2">
+          <div className="text-center py-8 sm:py-12 px-4 sm:px-6 rounded-2xl sm:rounded-3xl bg-foreground text-background">
+            <Phone className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-3 sm:mb-4 text-primary" />
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold mb-2">
               Have questions?
             </h2>
-            <p className="text-background/70 mb-6 max-w-md mx-auto">
+            <p className="text-background/70 mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
               We're here to help. Reach out to us anytime.
             </p>
             <a

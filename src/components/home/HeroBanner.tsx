@@ -29,7 +29,7 @@ const MarqueeText = ({ text, direction = "left" }: { text: string; direction?: "
         className="flex gap-8 min-w-full"
       >
         {Array.from({ length: 20 }).map((_, i) => (
-          <span key={i} className="text-[10rem] md:text-[14rem] font-black uppercase leading-none font-display text-gray-400">
+          <span key={i} className="text-[6rem] sm:text-[8rem] md:text-[11rem] lg:text-[14rem] font-black uppercase leading-none font-display text-gray-400">
             {text}
           </span>
         ))}
@@ -40,7 +40,8 @@ const MarqueeText = ({ text, direction = "left" }: { text: string; direction?: "
 
 export function HeroBanner() {
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden flex flex-col items-center justify-center min-h-[90vh]">
+    /* h = viewport minus sticky header (4rem) so everything fits without scroll */
+    <section className="relative py-4 sm:py-6 md:py-8 overflow-hidden flex flex-col items-center justify-start h-[calc(100dvh-4rem)]">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background z-0" />
 
@@ -51,12 +52,13 @@ export function HeroBanner() {
         <MarqueeText text="VIBE" direction="left" />
       </div>
 
-      <div className="container relative z-20">
-        <div className="text-center mb-4 md:mb-6">
+      <div className="container relative z-20 flex flex-col flex-1 min-h-0">
+        {/* Heading area — compact */}
+        <div className="text-center mb-2 sm:mb-3 md:mb-4 shrink-0">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 tracking-tight"
+            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-2 sm:mb-3 tracking-tight"
           >
             Welcome to <span className="gradient-text">Thryft</span>
           </motion.h1>
@@ -64,18 +66,18 @@ export function HeroBanner() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light"
+            className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto font-light"
           >
             Premium pre-owned products at unbeatable prices. Your gateway to luxury, sustainably.
           </motion.p>
         </div>
 
-        {/* Hero Carousel */}
-        <div className="mt-10 md:mt-14 flex justify-center">
+        {/* Hero Carousel — fills remaining space */}
+        <div className="flex-1 min-h-0 flex items-center justify-center mt-2 sm:mt-3 md:mt-4">
           <Carousel className="w-full max-w-6xl">
             <CarouselContent>
               {cards.map((card, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={index} className="basis-[75%] sm:basis-1/2 lg:basis-1/3 pl-3 md:pl-4">
                   <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -90,18 +92,20 @@ export function HeroBanner() {
                       scale: 1.03,
                       transition: { duration: 0.3, ease: "easeOut" },
                     }}
-                    className="w-full cursor-pointer"
+                    className="w-full cursor-pointer h-full"
                   >
-                    <div className="glass-card rounded-[2.25rem] overflow-hidden shadow-2xl transition-shadow duration-500 hover:shadow-glow">
-                      <div className="aspect-[3/4] relative bg-black/5">
+                    <div className="glass-card rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-2xl transition-shadow duration-500 hover:shadow-glow h-full">
+                      {/* Use a max height so cards never overflow the viewport */}
+                      <div className="relative bg-black/5 h-full" style={{ maxHeight: "calc(100dvh - 14rem)" }}>
                         <img
                           src={card.image}
                           alt={card.message}
                           className="w-full h-full object-cover"
+                          style={{ minHeight: "180px" }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-                        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-center">
-                          <p className="text-white text-xl md:text-2xl font-bold leading-tight font-display tracking-wide antialiased">
+                        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 md:p-6 text-center">
+                          <p className="text-white text-base sm:text-lg md:text-xl font-bold leading-tight font-display tracking-wide antialiased">
                             {card.message}
                           </p>
                         </div>

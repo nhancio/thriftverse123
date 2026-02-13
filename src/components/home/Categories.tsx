@@ -25,14 +25,14 @@ const categories = [
 
 export function Categories() {
   return (
-    <section className="py-16 md:py-24 bg-muted/30">
+    <section className="py-8 sm:py-12 md:py-24 bg-muted/30">
       <div className="container">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-6 md:mb-10">
           <div>
-            <h2 className="text-3xl md:text-4xl font-display font-bold">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold">
               Shop by Category
             </h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground text-sm sm:text-base mt-1 sm:mt-2">
               Find exactly what you're looking for
             </p>
           </div>

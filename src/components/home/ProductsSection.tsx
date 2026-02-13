@@ -8,14 +8,14 @@ import { useProducts } from "@/hooks/useProducts";
 export function ProductsSection() {
   const { products } = useProducts();
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-8 sm:py-12 md:py-24">
       <div className="container">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-6 md:mb-10">
           <div>
-            <h2 className="text-3xl md:text-4xl font-display font-bold">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold">
               Fresh Finds
             </h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground text-sm sm:text-base mt-1 sm:mt-2">
               Just dropped, don't miss out
             </p>
           </div>
@@ -27,7 +27,7 @@ export function ProductsSection() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {products.slice(0, 8).map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}

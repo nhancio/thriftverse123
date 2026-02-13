@@ -89,7 +89,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <Link to={`/product/${product.id}`} className="block group">
           <div className="feed-card rounded-xl overflow-hidden border border-border/50 bg-card">
             {/* Image */}
-            <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+            <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-muted">
               <img
                 src={product.images[0]}
                 alt={product.title}
