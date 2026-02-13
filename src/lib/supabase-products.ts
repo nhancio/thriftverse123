@@ -19,13 +19,24 @@ function mapProductRow(
   row: Tables<"products">,
   user: UserProfile
 ): Product {
+  // Debug: log raw image data from Supabase
+  console.log(`[DEBUG] Product "${row.title}" (${row.id})`);
+  console.log(`  Raw images from DB:`, JSON.stringify(row.images));
+  console.log(`  images type:`, typeof row.images, Array.isArray(row.images) ? "isArray" : "notArray");
+
   // Filter out blob: URLs (they are ephemeral and won't work for other users)
   const rawImages = Array.isArray(row.images) ? row.images : [];
   const images = rawImages.filter(
     (url) => typeof url === "string" && !url.startsWith("blob:")
   );
+
+  console.log(`  After filtering:`, JSON.stringify(images));
+
   // If no valid images remain, use a placeholder
-  if (images.length === 0) images.push(PLACEHOLDER_IMG);
+  if (images.length === 0) {
+    console.log(`  [WARN] No valid images — using placeholder`);
+    images.push(PLACEHOLDER_IMG);
+  }
   const measurements = row.measurements as Product["measurements"] | null;
   return {
     id: row.id,
@@ -55,34 +66,58 @@ function mapProductRow(
 }
 
 export async function fetchProductsFromSupabase(): Promise<Product[]> {
+  console.log("[DEBUG] Fetching products from Supabase...");
   const { data: productRows, error: productsError } = await supabase
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
 
+  console.log("[DEBUG] Products query result:", {
+    count: productRows?.length ?? 0,
+    error: productsError?.message ?? null,
+  });
+
   if (productsError || !productRows?.length) {
+    console.log("[DEBUG] No products found or error — returning empty");
     return [];
   }
 
   const userIds = [...new Set(productRows.map((p) => p.seller_id))];
+  console.log("[DEBUG] Fetching users for IDs:", userIds);
   const { data: userRows, error: usersError } = await supabase
     .from("users")
     .select("*")
     .in("id", userIds);
 
+  console.log("[DEBUG] Users query result:", {
+    count: userRows?.length ?? 0,
+    error: usersError?.message ?? null,
+  });
+
   if (usersError || !userRows?.length) {
+    console.log("[DEBUG] No users found or error — returning empty");
     return [];
   }
 
   const userMap = new Map(userRows.map((u) => [u.id, mapUserRow(u)]));
 
-  return productRows
+  const products = productRows
     .map((row) => {
       const user = userMap.get(row.seller_id);
-      if (!user) return null;
+      if (!user) {
+        console.log(`[DEBUG] Skipping product "${row.title}" — no matching user for seller_id: ${row.seller_id}`);
+        return null;
+      }
       return mapProductRow(row, user);
     })
     .filter(Boolean) as Product[];
+
+  console.log("[DEBUG] Final mapped products:", products.map((p) => ({
+    title: p.title,
+    images: p.images,
+  })));
+
+  return products;
 }
 
 export async function fetchProductByIdFromSupabase(
@@ -141,14 +176,16 @@ export async function upsertUser(user: {
 export async function uploadProductImage(file: File): Promise<string | null> {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `products/${crypto.randomUUID()}.${ext}`;
+  console.log(`[DEBUG] Uploading image: ${file.name} (${file.size} bytes) -> ${path}`);
   const { error } = await supabase.storage
     .from("product-images")
     .upload(path, file, { cacheControl: "3600", upsert: false });
   if (error) {
-    console.error("Upload error:", error.message);
+    console.error("[DEBUG] Upload error:", error.message);
     return null;
   }
   const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+  console.log(`[DEBUG] Upload success — public URL: ${data.publicUrl}`);
   return data.publicUrl;
 }
 

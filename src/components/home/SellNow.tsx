@@ -76,8 +76,8 @@ export function SellNow() {
             </div>
 
             <div className="text-center">
-              <Link to="/sell">
-                <Button variant="hero" size="xl">
+              <Link to="/sell" className="inline-block">
+                <Button variant="hero" size="xl" className="pointer-events-auto">
                   Start Selling Now
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
