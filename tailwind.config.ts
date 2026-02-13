@@ -67,6 +67,8 @@ export default {
         charcoal: "hsl(var(--charcoal))",
         cream: "hsl(var(--cream))",
         lavender: "hsl(var(--lavender))",
+        "peach-soft": "hsl(var(--peach-soft))",
+        sage: "hsl(var(--sage))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

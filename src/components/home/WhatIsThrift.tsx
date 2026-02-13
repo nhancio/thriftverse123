@@ -25,7 +25,7 @@ export function WhatIsThrift() {
               So… <span className="gradient-text">You Still Pay Full Price?</span>?
             </h2>
             <div className="space-y-6 mb-8">
-              <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-amber-50 via-background to-primary/10 p-6 md:p-8 shadow-lg">
+              <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-golden-soft/40 via-background to-primary/10 p-6 md:p-8 shadow-lg">
                 <div className="absolute -top-6 -right-4 text-7xl font-black text-primary/10 select-none">
                   ✶
                 </div>
