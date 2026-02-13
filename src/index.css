@@ -23,9 +23,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    /* Primary - Warm Golden Yellow (Gen Z energy, TikTok vibes) */
-    --primary: 45 100% 51%;
-    --primary-foreground: 220 15% 10%;
+    /* Primary - Bold Red (brand accent) */
+    --primary: 350 85% 55%;
+    --primary-foreground: 0 0% 100%;
 
     /* Secondary - Soft Lavender */
     --secondary: 270 30% 94%;
@@ -46,7 +46,7 @@
     /* Borders & Inputs */
     --border: 40 20% 88%;
     --input: 40 20% 88%;
-    --ring: 45 100% 51%;
+    --ring: 350 85% 55%;
 
     --radius: 1rem;
 
@@ -70,17 +70,17 @@
     --shadow-sm: 0 2px 8px hsl(220 15% 15% / 0.04);
     --shadow-md: 0 4px 16px hsl(220 15% 15% / 0.06);
     --shadow-lg: 0 8px 32px hsl(220 15% 15% / 0.08);
-    --shadow-glow: 0 0 40px hsl(45 100% 51% / 0.3);
+    --shadow-glow: 0 0 40px hsl(350 85% 55% / 0.25);
 
     /* Sidebar */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 15% 15%;
-    --sidebar-primary: 45 100% 51%;
-    --sidebar-primary-foreground: 220 15% 10%;
+    --sidebar-primary: 350 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 270 30% 94%;
     --sidebar-accent-foreground: 220 15% 20%;
     --sidebar-border: 40 20% 88%;
-    --sidebar-ring: 45 100% 51%;
+    --sidebar-ring: 350 85% 55%;
   }
 
   .dark {
@@ -93,8 +93,8 @@
     --popover: 220 18% 12%;
     --popover-foreground: 45 20% 95%;
 
-    --primary: 45 100% 55%;
-    --primary-foreground: 220 15% 8%;
+    --primary: 350 80% 60%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 270 20% 20%;
     --secondary-foreground: 45 20% 90%;
@@ -110,7 +110,7 @@
 
     --border: 220 15% 20%;
     --input: 220 15% 20%;
-    --ring: 45 100% 55%;
+    --ring: 350 80% 60%;
 
     --golden: 45 100% 55%;
     --golden-soft: 45 50% 25%;
@@ -128,16 +128,16 @@
     --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.2);
     --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.25);
     --shadow-lg: 0 8px 32px hsl(0 0% 0% / 0.3);
-    --shadow-glow: 0 0 40px hsl(45 100% 55% / 0.2);
+    --shadow-glow: 0 0 40px hsl(350 80% 60% / 0.2);
 
     --sidebar-background: 220 18% 10%;
     --sidebar-foreground: 45 20% 95%;
-    --sidebar-primary: 45 100% 55%;
-    --sidebar-primary-foreground: 220 15% 8%;
+    --sidebar-primary: 350 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 270 20% 20%;
     --sidebar-accent-foreground: 45 20% 90%;
     --sidebar-border: 220 15% 20%;
-    --sidebar-ring: 45 100% 55%;
+    --sidebar-ring: 350 80% 60%;
   }
 }
 
