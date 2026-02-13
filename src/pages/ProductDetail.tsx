@@ -136,6 +136,7 @@ export default function ProductDetail() {
                 src={product.images[currentImage]}
                 alt={product.title}
                 className="w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }}
               />
 
               {product.images.length > 1 && (
@@ -181,7 +182,7 @@ export default function ProductDetail() {
                       currentImage === i ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }} />
                   </button>
                 ))}
               </div>

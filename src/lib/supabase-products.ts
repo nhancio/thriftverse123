@@ -13,11 +13,19 @@ function mapUserRow(row: Tables<"users">): UserProfile {
   };
 }
 
+const PLACEHOLDER_IMG = "/images/placeholder-product.svg";
+
 function mapProductRow(
   row: Tables<"products">,
   user: UserProfile
 ): Product {
-  const images = Array.isArray(row.images) ? row.images : [];
+  // Filter out blob: URLs (they are ephemeral and won't work for other users)
+  const rawImages = Array.isArray(row.images) ? row.images : [];
+  const images = rawImages.filter(
+    (url) => typeof url === "string" && !url.startsWith("blob:")
+  );
+  // If no valid images remain, use a placeholder
+  if (images.length === 0) images.push(PLACEHOLDER_IMG);
   const measurements = row.measurements as Product["measurements"] | null;
   return {
     id: row.id,
