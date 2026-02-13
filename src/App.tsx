@@ -19,8 +19,8 @@ import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 // Initialize PostHog
-posthog.init("phc_r1QPhQP4XaBLcxOOPW8iohsvr1yVVZJRQgh4GY23ybJ", {
-  api_host: "https://us.i.posthog.com",
+posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+  api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
   capture_pageview: false, // we capture manually below
 });
 
