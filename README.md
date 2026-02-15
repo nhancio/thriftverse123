@@ -60,9 +60,11 @@ Product listings and auth use Supabase when configured.
    - `VITE_SUPABASE_PUBLISHABLE_KEY` — anon public key
 3. Run migrations: in the Supabase SQL editor, run the SQL in `supabase/migrations/20250101000000_products_sellers.sql`.
 4. (Optional) Seed data: run `supabase/seed.sql` in the SQL editor to add sample sellers and products.
-5. For **Login with Google**: in Supabase Dashboard go to Authentication → Providers → Google, enable it, and add your OAuth client ID/secret. Add your site URL and redirect URL (e.g. `http://localhost:5173`) in Authentication → URL Configuration.
+5. For **Login with Google**: in Supabase Dashboard go to Authentication → Providers → Google, enable it, and add your OAuth client ID/secret. In **Authentication → URL Configuration**, set **Site URL** to your production URL (e.g. `https://thryft.life`) and add **Redirect URLs** for both localhost and production (e.g. `http://localhost:5173`, `https://thryft.life/**`, `https://www.thryft.life/**`).
 
 Without `.env`, the app still runs using mock product data and no auth.
+
+**Using thryft.life?** See [DEPLOYMENT.md](./DEPLOYMENT.md) for DNS and Supabase steps so the domain loads and login works.
 
 ## What technologies are used for this project?
 
