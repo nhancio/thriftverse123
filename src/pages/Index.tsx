@@ -14,17 +14,17 @@ const Index = () => {
       <Categories />
 
       {/* Contact Us */}
-      <section className="py-8 sm:py-12 md:py-24">
-        <div className="container">
-          <div className="text-center py-8 sm:py-12 px-4 sm:px-6 rounded-2xl sm:rounded-3xl bg-foreground text-background">
-            <Phone className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-3 sm:mb-4 text-primary" />
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold mb-2">
+      <section className="py-5 sm:py-8 md:py-12">
+        <div className="container px-3 sm:px-4">
+          <div className="text-center py-6 sm:py-8 px-4 sm:px-6 rounded-2xl bg-foreground text-background">
+            <Phone className="w-7 h-7 sm:w-9 sm:h-9 mx-auto mb-2 sm:mb-3 text-primary" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold mb-1.5">
               Any queries? Please reach out
             </h2>
-            <p className="text-background/70 mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
+            <p className="text-background/70 mb-3 sm:mb-4 max-w-md mx-auto text-xs sm:text-sm">
               We're here to help. Reach out to us anytime.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
               <a
                 href="tel:7095288950"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold shadow-lg hover:opacity-90 transition-opacity"

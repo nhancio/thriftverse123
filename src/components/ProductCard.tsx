@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, Share2 } from "lucide-react";
+import { Eye, Heart, Share2 } from "lucide-react";
 import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useSavedProducts } from "@/hooks/useProducts";
 import { toast } from "sonner";
-import { openRazorpayCheckout } from "@/lib/razorpay";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 interface ProductCardProps {
@@ -40,13 +39,9 @@ const conditionLabel = {
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const navigate = useNavigate();
   const { user, signInWithGoogle } = useAuth();
+  const { isSaved, toggleSave } = useSavedProducts(user?.id);
   const [signInPromptOpen, setSignInPromptOpen] = useState(false);
-  const [notifyOpen, setNotifyOpen] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : null;
+  const liked = isSaved(product.id);
 
   const requireAuth = (action: () => void) => {
     if (!user) {
@@ -55,6 +50,19 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     }
     action();
   };
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    requireAuth(() => {
+      toggleSave(product.id);
+      toast.success(liked ? "Removed from saved" : "Saved!");
+    });
+  };
+
+  const discount = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : null;
 
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -115,12 +123,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
               {/* Quick actions on hover */}
               <div className="absolute top-2 right-2 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ top: product.status === "sold" || product.status === "hold" || discount ? "2rem" : "0.5rem" }}>
-                <Button
-                  variant="glass"
-                  size="icon"
-                  className="w-7 h-7"
-                  onClick={handleShare}
-                >
+                <Button variant="glass" size="icon" className="w-7 h-7" onClick={handleSave}>
+                  <Heart className={`w-3.5 h-3.5 ${liked ? "fill-destructive text-destructive" : ""}`} />
+                </Button>
+                <Button variant="glass" size="icon" className="w-7 h-7" onClick={handleShare}>
                   <Share2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
@@ -164,58 +170,25 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                 </span>
               </div>
 
-              {/* Action buttons on card */}
-              <div className="flex gap-1.5">
-                {product.status === "live" && (
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    className="flex-1 text-[10px] h-7 px-2"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      requireAuth(async () => {
-                        try {
-                          const result = await openRazorpayCheckout({
-                            amount: product.price,
-                            productName: product.title,
-                            email: user?.email ?? "",
-                            name: user?.user_metadata?.full_name ?? "",
-                          });
-                          toast.success(`Payment successful! ID: ${result.razorpay_payment_id}`);
-                        } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : "Payment failed";
-                          if (msg !== "Payment cancelled") toast.error(msg);
-                        }
-                      });
-                    }}
-                  >
-                    Buy now
-                  </Button>
-                )}
-                {product.status === "hold" && (
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    className="flex-1 text-[10px] h-7 px-2"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      requireAuth(() => setNotifyOpen(true));
-                    }}
-                  >
-                    Notify me
-                  </Button>
-                )}
-                {product.status === "sold" && (
-                  <Button variant="secondary" size="sm" className="flex-1 text-[10px] h-7 px-2" disabled>
-                    Sold out
-                  </Button>
-                )}
+              {/* Action buttons: Love, Know more, Share */}
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 px-2 text-[10px]"
+                  className="h-7 w-7 p-0 shrink-0"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSave(e);
+                  }}
+                  title={liked ? "Remove from saved" : "Save"}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${liked ? "fill-destructive text-destructive" : ""}`} />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 flex-1 min-w-0 text-[10px] px-2"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -223,6 +196,19 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                   }}
                 >
                   Know more
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 w-7 p-0 shrink-0"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleShare(e);
+                  }}
+                  title="Share"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
@@ -260,35 +246,6 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Notify dialog */}
-      <Dialog open={notifyOpen} onOpenChange={setNotifyOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Get notified</DialogTitle>
-            <DialogDescription>
-              Please provide your number to get updates when this item is available.
-            </DialogDescription>
-          </DialogHeader>
-          <Input
-            type="tel"
-            placeholder="Enter your phone number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <DialogFooter className="mt-2">
-            <Button
-              className="w-full"
-              onClick={() => {
-                setNotifyOpen(false);
-                setPhoneNumber("");
-                toast.success("We'll notify you with future drops.");
-              }}
-            >
-              Submit
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

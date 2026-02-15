@@ -3,15 +3,26 @@ import { Instagram, Phone } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background mt-20">
-      <div className="container py-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+    <footer className="bg-foreground text-background mt-8 sm:mt-12">
+      <div className="container py-8 sm:py-10 px-4 sm:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="text-2xl font-display font-bold">
-              <span className="text-primary">Thryft</span>
+            <Link to="/" className="inline-block">
+              <img
+                src="/images/full logo thryft final.png"
+                alt="Thryft"
+                className="h-8 md:h-10 w-auto max-w-[140px] object-contain object-left"
+                onError={(e) => {
+                  const t = e.target as HTMLImageElement;
+                  if (!t.dataset.fallback) {
+                    t.dataset.fallback = "1";
+                    t.src = "/images/logo.png";
+                  }
+                }}
+              />
             </Link>
-            <p className="text-background/70 text-sm mt-4 max-w-xs">
+            <p className="text-background/70 text-sm mt-3 sm:mt-4 max-w-xs">
               The Gen Z marketplace for unique finds. Thrifting made fresh, sustainable, and social.
             </p>
             <div className="flex gap-4 mt-6">
@@ -63,8 +74,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-background/20 mt-12 pt-8 text-center">
-          <p className="text-sm text-background/50">
+        <div className="border-t border-background/20 mt-8 pt-6 text-center">
+          <p className="text-xs sm:text-sm text-background/50">
             © 2026 Thryft. All rights reserved.
           </p>
         </div>

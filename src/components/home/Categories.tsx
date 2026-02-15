@@ -25,27 +25,27 @@ const categories = [
 
 export function Categories() {
   return (
-    <section className="py-8 sm:py-12 md:py-24 bg-muted/30">
-      <div className="container">
-        <div className="flex items-center justify-between mb-6 md:mb-10">
+    <section className="py-5 sm:py-8 md:py-12 bg-muted/30">
+      <div className="container px-3 sm:px-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold">
               Shop by Category
             </h2>
-            <p className="text-muted-foreground text-sm sm:text-base mt-1 sm:mt-2">
+            <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
               Find exactly what you're looking for
             </p>
           </div>
           <Link
             to="/categories"
-            className="hidden md:flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
+            className="hidden md:flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all text-sm"
           >
             View all categories
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           {categories.map((category, index) => (
             <motion.div
               key={category.slug}

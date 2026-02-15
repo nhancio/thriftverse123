@@ -8,26 +8,26 @@ import { useProducts } from "@/hooks/useProducts";
 export function ProductsSection() {
   const { products } = useProducts();
   return (
-    <section className="py-8 sm:py-12 md:py-24">
-      <div className="container">
-        <div className="flex items-center justify-between mb-6 md:mb-10">
+    <section className="pt-2 sm:pt-3 md:pt-5 pb-4 sm:pb-6 md:pb-8">
+      <div className="container px-3 sm:px-4">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
           <div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold">
               Fresh Finds
             </h2>
-            <p className="text-muted-foreground text-sm sm:text-base mt-1 sm:mt-2">
+            <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
               Just dropped, don't miss out
             </p>
           </div>
           <Link to="/browse">
-            <Button variant="ghost" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-sm">
               See all
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           {products.slice(0, 8).map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}
