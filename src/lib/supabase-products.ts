@@ -232,3 +232,50 @@ export async function insertProductListing(insert: {
   if (error) return { error: error.message };
   return { id: data.id };
 }
+
+/** Update a product listing. Only the listing owner (listed_by_uid) can update. Category and all editable fields can be changed. */
+export async function updateProductListing(
+  productId: string,
+  userId: string,
+  updates: {
+    title?: string;
+    description?: string;
+    category?: string;
+    subcategory?: string | null;
+    brand?: string;
+    price?: number;
+    original_price?: number | null;
+    images?: string[];
+    size?: string;
+    condition?: string;
+    era?: string | null;
+    tags?: string[];
+    allow_offers?: boolean;
+    shipping_cost?: number;
+    local_pickup?: boolean;
+    status?: string;
+  }
+): Promise<{ ok: true } | { error: string }> {
+  const { data: existing, error: fetchErr } = await supabase
+    .from("products")
+    .select("id, listed_by_uid")
+    .eq("id", productId)
+    .single();
+
+  if (fetchErr || !existing) return { error: "Product not found" };
+  if (existing.listed_by_uid !== userId) return { error: "You can only edit your own listings" };
+
+  const payload: Record<string, unknown> = { ...updates };
+  if (updates.condition !== undefined) {
+    payload.condition = updates.condition.toLowerCase().replace(/\s+/g, "-");
+  }
+
+  const { error: updateErr } = await supabase
+    .from("products")
+    .update(payload)
+    .eq("id", productId)
+    .eq("listed_by_uid", userId);
+
+  if (updateErr) return { error: updateErr.message };
+  return { ok: true };
+}

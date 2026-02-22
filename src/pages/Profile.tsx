@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   Plus,
   LogOut,
+  Pencil,
 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -149,7 +150,7 @@ export default function Profile() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="group"
+                    className="group relative"
                   >
                     <Link to={`/product/${product.id}`}>
                       <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-muted mb-2">
@@ -159,6 +160,13 @@ export default function Profile() {
                       <h3 className="text-sm font-medium truncate">{product.title}</h3>
                       <p className="font-semibold">₹{product.price.toLocaleString()}</p>
                       <p className="text-xs text-muted-foreground">{product.views} views</p>
+                    </Link>
+                    <Link
+                      to={`/sell/edit/${product.id}`}
+                      className="absolute top-2 left-2 rounded-lg bg-background/90 hover:bg-background p-2 shadow-sm border border-border"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Pencil className="w-4 h-4 text-muted-foreground" />
                     </Link>
                   </motion.div>
                 ))}

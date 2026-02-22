@@ -88,13 +88,17 @@ export function useSavedProducts(userId: string | undefined) {
     onMutate: async (productId) => {
       await queryClient.cancelQueries({ queryKey });
       const prev = queryClient.getQueryData<string[]>(queryKey) ?? [];
+      if (prev.includes(productId)) return { prev };
       queryClient.setQueryData(queryKey, [...prev, productId]);
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) queryClient.setQueryData(queryKey, ctx.prev);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
   });
 
   const unsave = useMutation({
@@ -108,7 +112,10 @@ export function useSavedProducts(userId: string | undefined) {
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) queryClient.setQueryData(queryKey, ctx.prev);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
   });
 
   const isSaved = (productId: string) => savedIds.includes(productId);

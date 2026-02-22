@@ -50,7 +50,14 @@ export function useAuth() {
       console.warn("Thryft: VITE_SUPABASE_URL is not set; login is disabled.");
       return;
     }
-    await supabase.auth.signInWithOAuth({ provider: "google" });
+    // Redirect back to current origin after login (localhost in dev, thryft.life in production)
+    const redirectTo = typeof window !== "undefined"
+      ? `${window.location.origin}${window.location.pathname || "/"}`
+      : undefined;
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: redirectTo ? { redirectTo } : undefined,
+    });
   };
 
   const signOut = async () => {

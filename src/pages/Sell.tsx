@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
@@ -19,7 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { insertProductListing, uploadProductImage } from "@/lib/supabase-products";
+import { useProduct } from "@/hooks/useProducts";
+import { useQueryClient } from "@tanstack/react-query";
+import { insertProductListing, updateProductListing, uploadProductImage } from "@/lib/supabase-products";
 import { toast } from "sonner";
 
 const steps = [
@@ -39,7 +41,13 @@ const watchSizes = ["38mm", "40mm", "41mm", "44mm", "45mm", "49mm"];
 // eras removed per user request
 
 export default function Sell() {
+  const { productId } = useParams<{ productId?: string }>(); // from /sell/edit/:productId
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { product: existingProduct, isLoading: productLoading } = useProduct(productId ?? undefined);
+  const isEditMode = !!productId && !!existingProduct && existingProduct.listedByUid === user?.id;
+
   const [currentStep, setCurrentStep] = useState(1);
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
@@ -69,6 +77,36 @@ export default function Sell() {
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Prefill form when editing (category is editable)
+  useEffect(() => {
+    if (!isEditMode || !existingProduct) return;
+    const conditionLabel =
+      existingProduct.condition === "new-with-tags" ? "New with tags" :
+      existingProduct.condition === "new" ? "New" :
+      existingProduct.condition === "like-new" ? "Like new" :
+      existingProduct.condition === "gently-used" ? "Gently used" :
+      existingProduct.condition === "worn" ? "Worn" : existingProduct.condition;
+    setFormData({
+      title: existingProduct.title,
+      category: existingProduct.category,
+      size: existingProduct.size,
+      condition: conditionLabel,
+      era: existingProduct.era ?? "",
+      description: existingProduct.description ?? "",
+      price: String(existingProduct.price),
+      allowOffers: existingProduct.allowOffers ?? true,
+      shippingIncluded: existingProduct.shippingCost === 0,
+      localPickup: existingProduct.localPickup ?? false,
+      storage: "",
+      model: "",
+      batteryHealth: "",
+      ram: "",
+      chip: "",
+      cellular: "",
+    });
+    setPhotos(existingProduct.images?.length ? existingProduct.images.slice(0, 6) : []);
+  }, [isEditMode, existingProduct]);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -105,7 +143,7 @@ export default function Sell() {
       case 1:
         return !!formData.category;
       case 2:
-        return photos.length >= 3;
+        return photos.length >= (isEditMode ? 1 : 3);
       case 3:
         return formData.title && formData.size && formData.condition;
       case 4:
@@ -118,41 +156,77 @@ export default function Sell() {
   const handlePublish = async () => {
     setPublishing(true);
     try {
-      // Upload images to Supabase Storage
-      toast.info("Uploading photos...");
-      const uploadedUrls: string[] = [];
-      for (const file of photoFiles) {
-        const url = await uploadProductImage(file);
-        if (url) uploadedUrls.push(url);
-      }
-      if (uploadedUrls.length === 0) {
-        toast.error("Failed to upload photos. Please try again.");
-        setPublishing(false);
-        return;
+      let imageUrls: string[];
+      if (isEditMode) {
+        // Edit: keep existing image URLs (http/https or /) and upload only new files
+        const existingUrls = photos.filter((p) => typeof p === "string" && (p.startsWith("http") || p.startsWith("/")));
+        const uploadedUrls: string[] = [];
+        for (const file of photoFiles) {
+          const url = await uploadProductImage(file);
+          if (url) uploadedUrls.push(url);
+        }
+        imageUrls = [...existingUrls, ...uploadedUrls].slice(0, 6);
+        if (imageUrls.length === 0) {
+          toast.error("At least one image is required.");
+          setPublishing(false);
+          return;
+        }
+      } else {
+        toast.info("Uploading photos...");
+        const uploadedUrls: string[] = [];
+        for (const file of photoFiles) {
+          const url = await uploadProductImage(file);
+          if (url) uploadedUrls.push(url);
+        }
+        if (uploadedUrls.length === 0) {
+          toast.error("Failed to upload photos. Please try again.");
+          setPublishing(false);
+          return;
+        }
+        imageUrls = uploadedUrls;
       }
 
-      const result = await insertProductListing({
+      const conditionSlug = formData.condition.toLowerCase().replace(/\s+/g, "-");
+      const payload = {
         title: formData.title,
         price: Number(formData.price),
-        images: uploadedUrls,
+        images: imageUrls,
         category: formData.category,
-        brand: formData.category, // brand = category (Apple products)
+        brand: formData.category,
         size: formData.size,
-        condition: formData.condition.toLowerCase().replace(/ /g, "-") as string,
+        condition: conditionSlug,
         era: formData.era || null,
         description: formData.description || "",
         tags: [formData.category.toLowerCase(), formData.size.toLowerCase()].filter(Boolean),
         allow_offers: formData.allowOffers,
         shipping_cost: formData.shippingIncluded ? 0 : 99,
         local_pickup: formData.localPickup,
-        status: "live",
-      });
+        status: "live" as const,
+      };
 
-      if ("error" in result) {
-        toast.error("Failed to publish: " + result.error);
+      if (isEditMode && productId && user?.id) {
+        const result = await updateProductListing(productId, user.id, {
+          ...payload,
+          condition: conditionSlug,
+        });
+        if ("error" in result) {
+          toast.error("Failed to update: " + result.error);
+        } else {
+          toast.success("Listing updated!");
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          queryClient.invalidateQueries({ queryKey: ["product", productId] });
+          setSubmitted(true);
+          setTimeout(() => navigate(`/product/${productId}`), 1500);
+        }
       } else {
-        toast.success("Listing published successfully!");
-        setSubmitted(true);
+        const result = await insertProductListing(payload);
+        if ("error" in result) {
+          toast.error("Failed to publish: " + result.error);
+        } else {
+          toast.success("Listing published successfully!");
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          setSubmitted(true);
+        }
       }
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
@@ -246,6 +320,25 @@ export default function Sell() {
     </div>
   );
 
+  /* ── Edit mode: redirect if not owner or product not found ── */
+  const editRedirectTriggered = useRef(false);
+  useEffect(() => {
+    if (!productId || authLoading || !user) return;
+    if (productLoading) return;
+    if (editRedirectTriggered.current) return;
+    if (!existingProduct) {
+      editRedirectTriggered.current = true;
+      navigate("/profile", { replace: true });
+      toast.error("Listing not found.");
+      return;
+    }
+    if (existingProduct.listedByUid !== user.id) {
+      editRedirectTriggered.current = true;
+      navigate(`/product/${productId}`, { replace: true });
+      toast.error("You can only edit your own listings.");
+    }
+  }, [productId, authLoading, user, productLoading, existingProduct, navigate]);
+
   /* ── Login gate: directly trigger Google sign-in ── */
   const loginTriggered = useRef(false);
   useEffect(() => {
@@ -262,6 +355,17 @@ export default function Sell() {
         <div className="text-center">
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-muted-foreground">Redirecting to sign in...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (productId && productLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading listing...</p>
         </div>
       </div>
     );
@@ -712,7 +816,7 @@ export default function Sell() {
             </Button>
           ) : (
             <Button variant="hero" disabled={!canProceed() || publishing} onClick={handlePublish}>
-              {publishing ? "Publishing..." : "Publish Listing"}
+              {publishing ? (isEditMode ? "Updating..." : "Publishing...") : isEditMode ? "Update listing" : "Publish Listing"}
               <Sparkles className="w-4 h-4 ml-2" />
             </Button>
           )}

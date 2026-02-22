@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Package,
   Ruler,
+  Pencil,
 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -248,9 +249,19 @@ export default function ProductDetail() {
 
             {/* Title & Price */}
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold mb-1">
-                {product.title}
-              </h1>
+              <div className="flex flex-wrap items-start gap-2">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold mb-1 flex-1 min-w-0">
+                  {product.title}
+                </h1>
+                {user?.id === product.listedByUid && (
+                  <Link to={`/sell/edit/${product.id}`}>
+                    <Button variant="outline" size="sm" className="shrink-0 gap-1.5">
+                      <Pencil className="w-3.5 h-3.5" />
+                      Edit listing
+                    </Button>
+                  </Link>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">{product.brand}</p>
               <div className="flex items-baseline gap-2 mt-3 flex-wrap">
                 <span className="text-2xl sm:text-3xl font-bold">₹{product.price.toLocaleString()}</span>
