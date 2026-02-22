@@ -265,10 +265,23 @@ export async function updateProductListing(
   if (fetchErr || !existing) return { error: "Product not found" };
   if (existing.listed_by_uid !== userId) return { error: "You can only edit your own listings" };
 
-  const payload: Record<string, unknown> = { ...updates };
-  if (updates.condition !== undefined) {
-    payload.condition = updates.condition.toLowerCase().replace(/\s+/g, "-");
+  // Build payload with only defined fields; condition normalized to slug
+  const payload: Record<string, unknown> = {};
+  const allowedKeys = [
+    "title", "description", "category", "subcategory", "brand", "price", "original_price",
+    "images", "size", "condition", "era", "tags", "allow_offers", "shipping_cost", "local_pickup", "status",
+  ] as const;
+  for (const key of allowedKeys) {
+    const v = updates[key];
+    if (v === undefined) continue;
+    if (key === "condition" && typeof v === "string") {
+      payload[key] = v.toLowerCase().replace(/\s+/g, "-");
+    } else {
+      payload[key] = v;
+    }
   }
+
+  if (Object.keys(payload).length === 0) return { ok: true };
 
   const { error: updateErr } = await supabase
     .from("products")
