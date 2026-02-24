@@ -51,6 +51,10 @@ export default function ProductDetail() {
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [signInPromptOpen, setSignInPromptOpen] = useState(false);
+  const [bookVisitOpen, setBookVisitOpen] = useState(false);
+  const [bookVisitStep, setBookVisitStep] = useState<1 | 2 | 3>(1);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [visitAddress, setVisitAddress] = useState("");
 
   const { product: foundProduct, isLoading } = useProduct(id);
   const product = foundProduct ?? null;
@@ -114,22 +118,45 @@ export default function ProductDetail() {
     });
   };
 
-  const handleBookVisit = () => {
-    requireAuth(async () => {
-      try {
-        const result = await openRazorpayCheckout({
-          amount: 1000,
-          productName: `Book visit — ${product!.title}`,
-          email: user?.email ?? "",
-          name: user?.user_metadata?.full_name ?? "",
-        });
-        toast.success(`Booking confirmed! ID: ${result.razorpay_payment_id}`);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Payment failed";
-        if (msg !== "Payment cancelled") toast.error(msg);
-      }
+  const handleBookVisitClick = () => {
+    requireAuth(() => {
+      setSelectedSlot(null);
+      setVisitAddress("");
+      setBookVisitStep(1);
+      setBookVisitOpen(true);
     });
   };
+
+  const handleBookVisitPayment = async () => {
+    if (!selectedSlot || !visitAddress.trim()) return;
+    try {
+      const result = await openRazorpayCheckout({
+        amount: 1000,
+        productName: `Book visit — ${product!.title}`,
+        email: user?.email ?? "",
+        name: user?.user_metadata?.full_name ?? "",
+      });
+      toast.success(`Booking confirmed! ID: ${result.razorpay_payment_id}`);
+      setBookVisitOpen(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Payment failed";
+      if (msg !== "Payment cancelled") toast.error(msg);
+    }
+  };
+
+  const visitSlots = (() => {
+    const slots: string[] = [];
+    const now = new Date();
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + d);
+      const dayStr = date.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+      ["10:00 AM", "2:00 PM", "5:00 PM"].forEach((time) => {
+        slots.push(`${dayStr}, ${time}`);
+      });
+    }
+    return slots;
+  })();
 
   const handleShare = () => {
     const url = `${window.location.origin}/product/${product.id}`;
@@ -162,60 +189,62 @@ export default function ProductDetail() {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 pb-28 lg:pb-8">
-          {/* ── LEFT: Image Gallery ── */}
-          <div className="space-y-3">
-            <div className="relative aspect-square sm:aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
-              <motion.img
-                key={currentImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                src={product.images[currentImage]}
-                alt={product.title}
-                className="w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }}
-              />
+          {/* ── LEFT: Image Gallery (main 80%, larger thumbnails) ── */}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex justify-center">
+              <div className="relative w-[80%] max-w-lg aspect-square sm:aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
+                <motion.img
+                  key={currentImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  src={product.images[currentImage]}
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }}
+                />
 
-              {product.images.length > 1 && (
-                <>
-                  <Button
-                    variant="glass"
-                    size="icon"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9"
-                    onClick={prevImage}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="glass"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9"
-                    onClick={nextImage}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </>
-              )}
+                {product.images.length > 1 && (
+                  <>
+                    <Button
+                      variant="glass"
+                      size="icon"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 sm:h-10 sm:w-10"
+                      onClick={prevImage}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="glass"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 sm:h-10 sm:w-10"
+                      onClick={nextImage}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
 
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-foreground/70 text-background px-2.5 py-0.5 rounded-full text-xs">
-                {currentImage + 1} / {product.images.length}
-              </div>
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-foreground/70 text-background px-2.5 py-0.5 rounded-full text-xs">
+                  {currentImage + 1} / {product.images.length}
+                </div>
 
-              <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                <Badge variant={conditionVariant[product.condition]}>
-                  {conditionLabel[product.condition]}
-                </Badge>
-                {product.era && <Badge variant="era">{product.era}</Badge>}
+                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                  <Badge variant={conditionVariant[product.condition]}>
+                    {conditionLabel[product.condition]}
+                  </Badge>
+                  {product.era && <Badge variant="era">{product.era}</Badge>}
+                </div>
               </div>
             </div>
 
             {product.images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 scrollbar-hide justify-center">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentImage(i)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 shrink-0 transition-all ${
-                      currentImage === i ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
+                    className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                      currentImage === i ? "border-primary ring-2 ring-primary/30" : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }} />
@@ -227,26 +256,6 @@ export default function ProductDetail() {
 
           {/* ── RIGHT: Info + Actions ── */}
           <div className="space-y-6">
-            {/* Listed by */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-              {product.seller.avatar ? (
-                <img src={product.seller.avatar} alt={product.seller.name} className="w-10 h-10 rounded-full shrink-0" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-muted-foreground shrink-0">
-                  {product.seller.name.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <span className="font-semibold text-sm truncate block">{product.seller.name}</span>
-                {product.seller.location && (
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {product.seller.location}
-                  </span>
-                )}
-              </div>
-            </div>
-
             {/* Title & Price */}
             <div>
               <div className="flex flex-wrap items-start gap-2">
@@ -301,7 +310,7 @@ export default function ProductDetail() {
                   <Button variant="hero" size="lg" className="w-full shadow-lg text-sm" onClick={handleBuyFull}>
                     Buy now · ₹{product.price.toLocaleString()}
                   </Button>
-                  <Button variant="outline" size="lg" className="w-full text-sm" onClick={handleBookVisit}>
+                  <Button variant="outline" size="lg" className="w-full text-sm" onClick={handleBookVisitClick}>
                     Pay ₹1,000 and book visit (fully refundable)
                   </Button>
                 </div>
@@ -344,7 +353,7 @@ export default function ProductDetail() {
                   <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div>
                     <div className="text-sm font-medium">Local Pickup</div>
-                    <div className="text-xs text-muted-foreground">Available in {product.seller.location}</div>
+                    <div className="text-xs text-muted-foreground">Available for local pickup</div>
                   </div>
                 </div>
               )}
@@ -389,14 +398,14 @@ export default function ProductDetail() {
       </main>
 
       {/* ── MOBILE STICKY BAR ── */}
-      <div className="fixed bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur border-t border-border z-40 lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur border-t border-border z-40 lg:hidden safe-bottom">
         <div className="flex items-center gap-2 max-w-lg mx-auto">
           {product.status === "live" && (
             <>
               <Button variant="hero" size="default" className="flex-1 shadow-lg text-xs sm:text-sm" onClick={handleBuyFull}>
                 Buy now · ₹{product.price.toLocaleString()}
               </Button>
-              <Button variant="outline" size="default" className="flex-1 text-xs sm:text-sm" onClick={handleBookVisit}>
+              <Button variant="outline" size="default" className="flex-1 text-xs sm:text-sm" onClick={handleBookVisitClick}>
                 Book visit · ₹1,000
               </Button>
             </>
@@ -424,6 +433,79 @@ export default function ProductDetail() {
           </Button>
         </div>
       </div>
+
+      {/* Book visit: slot → address → payment */}
+      <Dialog open={bookVisitOpen} onOpenChange={(open) => { setBookVisitOpen(open); if (!open) setBookVisitStep(1); }}>
+        <DialogContent className="max-w-md sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Book a visit</DialogTitle>
+            <DialogDescription>
+              {bookVisitStep === 1 && "Choose a time slot for your visit."}
+              {bookVisitStep === 2 && "Enter the address where you want the visit."}
+              {bookVisitStep === 3 && "Review and pay ₹1,000 (fully refundable)."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {bookVisitStep === 1 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                {visitSlots.map((slot) => (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => setSelectedSlot(slot)}
+                    className={`p-3 rounded-xl border-2 text-left text-sm transition-all ${
+                      selectedSlot === slot ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+            )}
+            {bookVisitStep === 2 && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Address</label>
+                <Input
+                  placeholder="Full address for the visit"
+                  value={visitAddress}
+                  onChange={(e) => setVisitAddress(e.target.value)}
+                  className="min-h-[44px]"
+                />
+              </div>
+            )}
+            {bookVisitStep === 3 && (
+              <div className="rounded-xl border border-border p-4 space-y-2 text-sm">
+                <p><span className="text-muted-foreground">Slot:</span> {selectedSlot}</p>
+                <p><span className="text-muted-foreground">Address:</span> {visitAddress}</p>
+                <p className="font-semibold pt-2">Amount: ₹1,000 (refundable)</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            {bookVisitStep > 1 ? (
+              <Button variant="outline" className="flex-1 sm:flex-initial min-h-[44px] sm:min-h-0" onClick={() => setBookVisitStep((s) => (s - 1) as 1 | 2 | 3)}>
+                Back
+              </Button>
+            ) : (
+              <div className="flex-1" />
+            )}
+            {bookVisitStep < 3 ? (
+              <Button
+                variant="hero"
+                className="flex-1 sm:flex-initial min-h-[44px] sm:min-h-0"
+                onClick={() => setBookVisitStep((s) => (s + 1) as 1 | 2 | 3)}
+                disabled={bookVisitStep === 1 ? !selectedSlot : bookVisitStep === 2 ? !visitAddress.trim() : false}
+              >
+                Next
+              </Button>
+            ) : (
+              <Button variant="hero" className="flex-1 sm:flex-initial min-h-[44px] sm:min-h-0" onClick={handleBookVisitPayment}>
+                Pay ₹1,000
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Notify dialog */}
       <Dialog open={notifyOpen} onOpenChange={setNotifyOpen}>

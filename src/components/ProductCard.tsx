@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, Heart, Share2 } from "lucide-react";
+import { Heart, Share2 } from "lucide-react";
 import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -131,28 +131,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                 </Button>
               </div>
 
-              {/* Hover stats */}
-              {product.status !== "sold" && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="flex items-center gap-3 text-background text-xs">
-                    <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{product.views}</span>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Content */}
             <div className="p-3">
-              <div className="flex items-center gap-1.5 mb-1.5">
-                {product.seller.avatar ? (
-                  <img src={product.seller.avatar} alt="" className="w-4 h-4 rounded-full shrink-0" />
-                ) : (
-                  <div className="w-4 h-4 rounded-full bg-muted text-[8px] font-bold flex items-center justify-center shrink-0">
-                    {product.seller.name.charAt(0)}
-                  </div>
-                )}
-                <span className="text-[11px] text-muted-foreground truncate">{product.seller.name}</span>
-              </div>
               <h3 className="font-medium text-xs sm:text-sm leading-tight line-clamp-2 mb-1.5 group-hover:text-primary transition-colors">
                 {product.title}
               </h3>

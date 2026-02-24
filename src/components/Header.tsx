@@ -26,7 +26,7 @@ export function Header() {
   return (
     <>
       <LocationPrompt open={showLocationPrompt} onClose={() => setShowLocationPrompt(false)} />
-      <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-background/70 backdrop-blur-2xl border-b border-black/5 dark:border-white/10 shadow-[0_1px_20px_rgba(0,0,0,0.04)]">
+      <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-background/70 backdrop-blur-2xl border-b border-black/5 dark:border-white/10 shadow-[0_1px_20px_rgba(0,0,0,0.04)] safe-top">
         <div className="container relative flex h-16 items-center gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center shrink-0 z-10">
