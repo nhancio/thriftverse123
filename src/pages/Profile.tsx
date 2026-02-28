@@ -32,7 +32,7 @@ export default function Profile() {
     const tab = searchParams.get("tab");
     if (tab) setActiveTab(tab);
   }, [searchParams]);
-  const { user, signInWithGoogle, signOut } = useAuth();
+  const { user, signInWithGoogle, signOut, authError } = useAuth();
   const { products } = useProducts();
   const { savedIds } = useSavedProducts(user?.id);
   const savedProducts = products.filter((p) => savedIds.includes(p.id));
@@ -42,6 +42,11 @@ export default function Profile() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container py-12 text-center">
+          {authError && (
+            <p className="text-destructive mb-4 text-sm max-w-md mx-auto">
+              Sign-in failed. Please try again. If it keeps failing, the app may need its Google sign-in settings updated.
+            </p>
+          )}
           <p className="text-muted-foreground mb-4">Sign in to view your profile.</p>
           <Button variant="hero" onClick={() => signInWithGoogle()}>Login with Google</Button>
         </main>
