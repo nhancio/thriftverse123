@@ -27,7 +27,7 @@ export function Footer() {
             </p>
             <div className="flex gap-4 mt-6">
               <a
-                href="https://www.instagram.com/__thryft___/"
+                href="https://www.instagram.com/thryt.life/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-background/70 hover:text-primary transition-colors"
