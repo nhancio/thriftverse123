@@ -24,6 +24,7 @@ interface ProductCardProps {
 
 const conditionVariant = {
   new: "condition-new",
+  "new-with-tags": "condition-new-with-tags",
   "like-new": "condition-like-new",
   "gently-used": "condition-gently-used",
   worn: "condition-worn",
@@ -31,6 +32,7 @@ const conditionVariant = {
 
 const conditionLabel = {
   new: "New",
+  "new-with-tags": "New with tags",
   "like-new": "Like New",
   "gently-used": "Gently Used",
   worn: "Worn",

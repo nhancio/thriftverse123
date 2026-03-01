@@ -33,13 +33,15 @@ import {
 
 const conditionVariant = {
   new: "condition-new",
+  "new-with-tags": "condition-new-with-tags",
   "like-new": "condition-like-new",
   "gently-used": "condition-gently-used",
   worn: "condition-worn",
 } as const;
 
 const conditionLabel = {
-  new: "New with tags",
+  new: "New",
+  "new-with-tags": "New with tags",
   "like-new": "Like New",
   "gently-used": "Gently Used",
   worn: "Well Loved",

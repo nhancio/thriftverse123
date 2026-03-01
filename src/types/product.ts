@@ -21,7 +21,7 @@ export interface Product {
   subcategory: string;
   brand: string;
   size: string;
-  condition: "new" | "like-new" | "gently-used" | "worn";
+  condition: "new" | "new-with-tags" | "like-new" | "gently-used" | "worn";
   era?: string;
   description: string;
   seller: UserProfile;
