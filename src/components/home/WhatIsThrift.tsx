@@ -105,6 +105,8 @@ export function WhatIsThrift() {
               <img
                 src={whatIsThriftImage}
                 alt="Happy thrifting experience"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-cover"
               />
             </div>

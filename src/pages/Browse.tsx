@@ -138,12 +138,12 @@ export default function Browse() {
               ))}
             </div>
 
-            {/* Load More */}
-            <div className="text-center mt-8">
-              <Button variant="outline" size="lg">
-                Load more finds
-              </Button>
-            </div>
+            {/* End of results */}
+            {filteredProducts.length > 0 && (
+              <p className="text-center mt-8 text-sm text-muted-foreground">
+                You've seen all {filteredProducts.length} items
+              </p>
+            )}
           </div>
         </div>
       </main>

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { LocationPrompt, getStoredLocation } from "@/components/LocationPrompt";
+import { LOGO_IMG, handleImgError } from "@/lib/constants";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,20 +33,15 @@ export function Header() {
           <Link to="/" className="flex items-center shrink-0 z-10">
             <motion.div whileHover={{ scale: 1.03 }} className="flex items-center">
               <img
-                src="/images/full logo thryft final.png"
+                src={LOGO_IMG}
                 alt="Thryft"
                 className="h-10 md:h-12 w-auto max-w-[180px] object-contain object-left"
-                onError={(e) => {
-                  const t = e.target as HTMLImageElement;
-                  if (t.src !== "/images/logo.png") {
-                    t.src = "/images/logo.png";
-                  }
-                }}
+                onError={(e) => handleImgError(e, "/favicon.ico")}
               />
             </motion.div>
           </Link>
 
-          {/* Center: Nav + Search — absolutely centered; pointer-events-none on wrapper so right-side Login can receive clicks */}
+          {/* Center: Nav + Search */}
           <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-3 pointer-events-none">
             <nav className="flex items-center gap-2 pointer-events-auto">
               {navLinks.map((link) => (

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -23,6 +23,13 @@ import { useProduct } from "@/hooks/useProducts";
 import { useQueryClient } from "@tanstack/react-query";
 import { insertProductListing, updateProductListing, uploadProductImage } from "@/lib/supabase-products";
 import { toast } from "sonner";
+import { MAX_UPLOAD_SIZE_MB, MAX_UPLOAD_SIZE_BYTES } from "@/lib/constants";
+
+/** Each photo entry tracks its preview URL and optionally the File (null for existing URLs in edit mode) */
+interface PhotoEntry {
+  previewUrl: string;
+  file: File | null; // null = existing uploaded URL, no re-upload needed
+}
 
 const steps = [
   { id: 1, title: "Category", description: "Choose product type" },
@@ -49,8 +56,7 @@ export default function Sell() {
   const isEditMode = !!productId && !!existingProduct && existingProduct.listedByUid === user?.id;
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoEntries, setPhotoEntries] = useState<PhotoEntry[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -105,30 +111,47 @@ export default function Sell() {
       chip: "",
       cellular: "",
     });
-    setPhotos(existingProduct.images?.length ? existingProduct.images.slice(0, 6) : []);
+    setPhotoEntries(
+      existingProduct.images?.length
+        ? existingProduct.images.slice(0, 6).map((url) => ({ previewUrl: url, file: null }))
+        : []
+    );
   }, [isEditMode, existingProduct]);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Cleanup blob URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      photoEntries.forEach((entry) => {
+        if (entry.previewUrl.startsWith("blob:")) URL.revokeObjectURL(entry.previewUrl);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handlePhotoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
-    const newUrls: string[] = [];
-    const newFiles: File[] = [];
-    for (let i = 0; i < files.length && photos.length + newUrls.length < 6; i++) {
-      newUrls.push(URL.createObjectURL(files[i]));
-      newFiles.push(files[i]);
+    const newEntries: PhotoEntry[] = [];
+    for (let i = 0; i < files.length; i++) {
+      if (photoEntries.length + newEntries.length >= 6) break;
+      const file = files[i];
+      if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+        toast.error(`"${file.name}" exceeds ${MAX_UPLOAD_SIZE_MB}MB limit — skipped.`);
+        continue;
+      }
+      newEntries.push({ previewUrl: URL.createObjectURL(file), file });
     }
-    setPhotos((prev) => [...prev, ...newUrls].slice(0, 6));
-    setPhotoFiles((prev) => [...prev, ...newFiles].slice(0, 6));
+    setPhotoEntries((prev) => [...prev, ...newEntries].slice(0, 6));
     e.target.value = "";
-  };
+  }, [photoEntries.length]);
 
-  const removePhoto = (index: number) => {
-    setPhotos((prev) => {
-      if (prev[index]?.startsWith("blob:")) URL.revokeObjectURL(prev[index]);
+  const removePhoto = useCallback((index: number) => {
+    setPhotoEntries((prev) => {
+      const entry = prev[index];
+      if (entry?.previewUrl.startsWith("blob:")) URL.revokeObjectURL(entry.previewUrl);
       return prev.filter((_, i) => i !== index);
     });
-    setPhotoFiles((prev) => prev.filter((_, i) => i !== index));
-  };
+  }, []);
 
   const nextStep = () => {
     if (currentStep < 5) setCurrentStep(currentStep + 1);
@@ -143,7 +166,7 @@ export default function Sell() {
       case 1:
         return !!formData.category;
       case 2:
-        return photos.length >= (isEditMode ? 1 : 3);
+        return photoEntries.length >= (isEditMode ? 1 : 3);
       case 3:
         return formData.title && formData.size && formData.condition;
       case 4:
@@ -156,34 +179,22 @@ export default function Sell() {
   const handlePublish = async () => {
     setPublishing(true);
     try {
-      let imageUrls: string[];
-      if (isEditMode) {
-        // Edit: keep existing image URLs (http/https or /) and upload only new files
-        const existingUrls = photos.filter((p) => typeof p === "string" && (p.startsWith("http") || p.startsWith("/")));
-        const uploadedUrls: string[] = [];
-        for (const file of photoFiles) {
-          const url = await uploadProductImage(file);
-          if (url) uploadedUrls.push(url);
+      // Upload new files, keep existing URLs — entries track both correctly
+      toast.info("Uploading photos...");
+      const imageUrls: string[] = [];
+      for (const entry of photoEntries) {
+        if (entry.file) {
+          const url = await uploadProductImage(entry.file);
+          if (url) imageUrls.push(url);
+        } else {
+          // Existing URL (edit mode) — keep as-is
+          imageUrls.push(entry.previewUrl);
         }
-        imageUrls = [...existingUrls, ...uploadedUrls].slice(0, 6);
-        if (imageUrls.length === 0) {
-          toast.error("At least one image is required.");
-          setPublishing(false);
-          return;
-        }
-      } else {
-        toast.info("Uploading photos...");
-        const uploadedUrls: string[] = [];
-        for (const file of photoFiles) {
-          const url = await uploadProductImage(file);
-          if (url) uploadedUrls.push(url);
-        }
-        if (uploadedUrls.length === 0) {
-          toast.error("Failed to upload photos. Please try again.");
-          setPublishing(false);
-          return;
-        }
-        imageUrls = uploadedUrls;
+      }
+      if (imageUrls.length === 0) {
+        toast.error("Failed to upload photos. Please try again.");
+        setPublishing(false);
+        return;
       }
 
       const conditionSlug = formData.condition.toLowerCase().replace(/\s+/g, "-");
@@ -192,7 +203,7 @@ export default function Sell() {
         price: Number(formData.price),
         images: imageUrls,
         category: formData.category,
-        brand: formData.category,
+        brand: formData.title.split(" ")[0] || formData.category,
         size: formData.size,
         condition: conditionSlug,
         era: formData.era || null,
@@ -239,8 +250,10 @@ export default function Sell() {
     setSubmitted(false);
     setShowPreview(false);
     setCurrentStep(1);
-    setPhotos([]);
-    setPhotoFiles([]);
+    photoEntries.forEach((e) => {
+      if (e.previewUrl.startsWith("blob:")) URL.revokeObjectURL(e.previewUrl);
+    });
+    setPhotoEntries([]);
     setFormData({
       title: "",
       category: "",
@@ -261,14 +274,17 @@ export default function Sell() {
     });
   };
 
+  // Derived preview URLs for rendering (keeps JSX clean)
+  const photos = photoEntries.map((e) => e.previewUrl);
+
   /* ── Listing Preview Card (reused in step 5 and confirmation) ── */
   const ListingPreview = ({ compact = false }: { compact?: boolean }) => (
     <div className={cn("rounded-2xl border border-border overflow-hidden bg-card", compact && "max-w-sm mx-auto")}>
       {/* Photo gallery */}
       {photos.length > 0 && (
         <div className="relative">
-          <div className={cn("relative overflow-hidden", compact ? "aspect-square" : "aspect-[4/3]")}>
-            <img src={photos[0]} alt="" className="w-full h-full object-cover" />
+          <div className={cn("relative overflow-hidden bg-muted", compact ? "aspect-square" : "aspect-[4/3]")}>
+            <img src={photos[0]} alt="" className="w-full h-full object-contain" />
             {photos.length > 1 && (
               <span className="absolute bottom-2 right-2 bg-foreground/70 text-background px-2 py-0.5 rounded-full text-xs">
                 +{photos.length - 1} more
@@ -278,8 +294,8 @@ export default function Sell() {
           {!compact && photos.length > 1 && (
             <div className="flex gap-1 p-2">
               {photos.slice(1, 4).map((p, i) => (
-                <div key={i} className="w-16 h-16 rounded-lg overflow-hidden">
-                  <img src={p} alt="" className="w-full h-full object-cover" />
+                <div key={i} className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
+                  <img src={p} alt="" className="w-full h-full object-contain" />
                 </div>
               ))}
               {photos.length > 4 && (
@@ -528,8 +544,8 @@ export default function Sell() {
                       )}
                     >
                       {photos[i] ? (
-                        <div className="relative w-full h-full group">
-                          <img src={photos[i]} alt="" className="w-full h-full object-cover" />
+                        <div className="relative w-full h-full group bg-muted">
+                          <img src={photos[i]} alt="" className="w-full h-full object-contain" />
                           <button
                             type="button"
                             onClick={() => removePhoto(i)}

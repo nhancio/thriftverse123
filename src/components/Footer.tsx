@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Phone } from "lucide-react";
+import { LOGO_IMG, handleImgError } from "@/lib/constants";
 
 export function Footer() {
   return (
@@ -10,16 +11,10 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block">
               <img
-                src="/images/full logo thryft final.png"
+                src={LOGO_IMG}
                 alt="Thryft"
-                className="h-8 md:h-10 w-auto max-w-[140px] object-contain object-left"
-                onError={(e) => {
-                  const t = e.target as HTMLImageElement;
-                  if (!t.dataset.fallback) {
-                    t.dataset.fallback = "1";
-                    t.src = "/images/logo.png";
-                  }
-                }}
+                className="h-8 md:h-10 w-auto max-w-[140px] object-contain object-left brightness-0 invert"
+                onError={(e) => handleImgError(e, "/favicon.ico")}
               />
             </Link>
             <p className="text-background/70 text-sm mt-3 sm:mt-4 max-w-xs">
@@ -76,7 +71,7 @@ export function Footer() {
 
         <div className="border-t border-background/20 mt-8 pt-6 text-center">
           <p className="text-xs sm:text-sm text-background/50">
-            © 2026 Thryft. All rights reserved.
+            &copy; 2026 Thryft. All rights reserved.
           </p>
         </div>
       </div>

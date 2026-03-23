@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -22,6 +22,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { openRazorpayCheckout } from "@/lib/razorpay";
+import { SignInDialog } from "@/components/SignInDialog";
+import { conditionVariant, conditionLabel, handleImgError } from "@/lib/constants";
 import {
   Dialog,
   DialogContent,
@@ -30,22 +32,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-const conditionVariant = {
-  new: "condition-new",
-  "new-with-tags": "condition-new-with-tags",
-  "like-new": "condition-like-new",
-  "gently-used": "condition-gently-used",
-  worn: "condition-worn",
-} as const;
-
-const conditionLabel = {
-  new: "New",
-  "new-with-tags": "New with tags",
-  "like-new": "Like New",
-  "gently-used": "Gently Used",
-  worn: "Well Loved",
-} as const;
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -62,6 +48,20 @@ export default function ProductDetail() {
   const product = foundProduct ?? null;
   const { user, signInWithGoogle } = useAuth();
   const { isSaved, toggleSave } = useSavedProducts(user?.id);
+
+  const visitSlots = useMemo(() => {
+    const slots: string[] = [];
+    const now = new Date();
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + d);
+      const dayStr = date.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+      ["10:00 AM", "2:00 PM", "5:00 PM"].forEach((time) => {
+        slots.push(`${dayStr}, ${time}`);
+      });
+    }
+    return slots;
+  }, []);
 
   if (isLoading) {
     return (
@@ -94,7 +94,6 @@ export default function ProductDetail() {
     );
   };
 
-  /** Gate actions behind sign-in */
   const requireAuth = (action: () => void) => {
     if (!user) {
       setSignInPromptOpen(true);
@@ -107,8 +106,8 @@ export default function ProductDetail() {
     requireAuth(async () => {
       try {
         const result = await openRazorpayCheckout({
-          amount: product!.price,
-          productName: product!.title,
+          amount: product.price,
+          productName: product.title,
           email: user?.email ?? "",
           name: user?.user_metadata?.full_name ?? "",
         });
@@ -134,7 +133,7 @@ export default function ProductDetail() {
     try {
       const result = await openRazorpayCheckout({
         amount: 1000,
-        productName: `Book visit — ${product!.title}`,
+        productName: `Book visit — ${product.title}`,
         email: user?.email ?? "",
         name: user?.user_metadata?.full_name ?? "",
       });
@@ -145,20 +144,6 @@ export default function ProductDetail() {
       if (msg !== "Payment cancelled") toast.error(msg);
     }
   };
-
-  const visitSlots = (() => {
-    const slots: string[] = [];
-    const now = new Date();
-    for (let d = 0; d < 7; d++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() + d);
-      const dayStr = date.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
-      ["10:00 AM", "2:00 PM", "5:00 PM"].forEach((time) => {
-        slots.push(`${dayStr}, ${time}`);
-      });
-    }
-    return slots;
-  })();
 
   const handleShare = () => {
     const url = `${window.location.origin}/product/${product.id}`;
@@ -191,7 +176,7 @@ export default function ProductDetail() {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 pb-28 lg:pb-8">
-          {/* ── LEFT: Image Gallery (main 80%, larger thumbnails) ── */}
+          {/* LEFT: Image Gallery */}
           <div className="space-y-3 sm:space-y-4">
             <div className="flex justify-center">
               <div className="relative w-[80%] max-w-lg aspect-square sm:aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
@@ -202,7 +187,7 @@ export default function ProductDetail() {
                   src={product.images[currentImage]}
                   alt={product.title}
                   className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }}
+                  onError={handleImgError}
                 />
 
                 {product.images.length > 1 && (
@@ -249,14 +234,21 @@ export default function ProductDetail() {
                       currentImage === i ? "border-primary ring-2 ring-primary/30" : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/images/placeholder-product.svg"; }} />
+                    <img
+                      src={img}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                      onError={handleImgError}
+                    />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* ── RIGHT: Info + Actions ── */}
+          {/* RIGHT: Info + Actions */}
           <div className="space-y-6">
             {/* Title & Price */}
             <div>
@@ -275,11 +267,11 @@ export default function ProductDetail() {
               </div>
               <p className="text-sm text-muted-foreground">{product.brand}</p>
               <div className="flex items-baseline gap-2 mt-3 flex-wrap">
-                <span className="text-2xl sm:text-3xl font-bold">₹{product.price.toLocaleString()}</span>
+                <span className="text-2xl sm:text-3xl font-bold">{"\u20B9"}{product.price.toLocaleString()}</span>
                 {product.originalPrice && (
                   <>
                     <span className="text-base sm:text-lg text-muted-foreground line-through">
-                      ₹{product.originalPrice.toLocaleString()}
+                      {"\u20B9"}{product.originalPrice.toLocaleString()}
                     </span>
                     <Badge variant="sale">-{discount}%</Badge>
                   </>
@@ -305,15 +297,15 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* ── ACTION BUTTONS ── */}
+            {/* ACTION BUTTONS */}
             <div className="hidden lg:block space-y-3">
               {product.status === "live" && (
                 <div className="flex flex-col gap-2.5">
                   <Button variant="hero" size="lg" className="w-full shadow-lg text-sm" onClick={handleBuyFull}>
-                    Buy now · ₹{product.price.toLocaleString()}
+                    Buy now · {"\u20B9"}{product.price.toLocaleString()}
                   </Button>
                   <Button variant="outline" size="lg" className="w-full text-sm" onClick={handleBookVisitClick}>
-                    Pay ₹1,000 and book visit (fully refundable)
+                    Pay {"\u20B9"}1,000 and book visit (fully refundable)
                   </Button>
                 </div>
               )}
@@ -346,7 +338,7 @@ export default function ProductDetail() {
                 <div>
                   <div className="text-sm font-medium">Shipping</div>
                   <div className="text-xs text-muted-foreground">
-                    {product.shippingCost === 0 ? "Free" : `₹${product.shippingCost}`} · Estimated 3-5 days
+                    {product.shippingCost === 0 ? "Free" : `\u20B9${product.shippingCost}`} · Estimated 3-5 days
                   </div>
                 </div>
               </div>
@@ -399,16 +391,16 @@ export default function ProductDetail() {
         </div>
       </main>
 
-      {/* ── MOBILE STICKY BAR ── */}
+      {/* MOBILE STICKY BAR */}
       <div className="fixed bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur border-t border-border z-40 lg:hidden safe-bottom">
         <div className="flex items-center gap-2 max-w-lg mx-auto">
           {product.status === "live" && (
             <>
               <Button variant="hero" size="default" className="flex-1 shadow-lg text-xs sm:text-sm" onClick={handleBuyFull}>
-                Buy now · ₹{product.price.toLocaleString()}
+                Buy now · {"\u20B9"}{product.price.toLocaleString()}
               </Button>
               <Button variant="outline" size="default" className="flex-1 text-xs sm:text-sm" onClick={handleBookVisitClick}>
-                Book visit · ₹1,000
+                Book visit · {"\u20B9"}1,000
               </Button>
             </>
           )}
@@ -436,7 +428,7 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Book visit: slot → address → payment */}
+      {/* Book visit: slot -> address -> payment */}
       <Dialog open={bookVisitOpen} onOpenChange={(open) => { setBookVisitOpen(open); if (!open) setBookVisitStep(1); }}>
         <DialogContent className="max-w-md sm:max-w-lg">
           <DialogHeader>
@@ -444,7 +436,7 @@ export default function ProductDetail() {
             <DialogDescription>
               {bookVisitStep === 1 && "Choose a time slot for your visit."}
               {bookVisitStep === 2 && "Enter the address where you want the visit."}
-              {bookVisitStep === 3 && "Review and pay ₹1,000 (fully refundable)."}
+              {bookVisitStep === 3 && "Review and pay \u20B91,000 (fully refundable)."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -479,7 +471,7 @@ export default function ProductDetail() {
               <div className="rounded-xl border border-border p-4 space-y-2 text-sm">
                 <p><span className="text-muted-foreground">Slot:</span> {selectedSlot}</p>
                 <p><span className="text-muted-foreground">Address:</span> {visitAddress}</p>
-                <p className="font-semibold pt-2">Amount: ₹1,000 (refundable)</p>
+                <p className="font-semibold pt-2">Amount: {"\u20B9"}1,000 (refundable)</p>
               </div>
             )}
           </div>
@@ -502,7 +494,7 @@ export default function ProductDetail() {
               </Button>
             ) : (
               <Button variant="hero" className="flex-1 sm:flex-initial min-h-[44px] sm:min-h-0" onClick={handleBookVisitPayment}>
-                Pay ₹1,000
+                Pay {"\u20B9"}1,000
               </Button>
             )}
           </DialogFooter>
@@ -540,34 +532,11 @@ export default function ProductDetail() {
       </Dialog>
 
       {/* Sign-in prompt dialog */}
-      <Dialog open={signInPromptOpen} onOpenChange={setSignInPromptOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Sign in required</DialogTitle>
-            <DialogDescription>
-              Please sign in to continue. It takes just a few seconds.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="mt-2">
-            <Button
-              variant="hero"
-              className="w-full gap-2"
-              onClick={() => {
-                setSignInPromptOpen(false);
-                signInWithGoogle();
-              }}
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Login with Google
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SignInDialog
+        open={signInPromptOpen}
+        onOpenChange={setSignInPromptOpen}
+        onSignIn={signInWithGoogle}
+      />
 
       <Footer />
     </div>

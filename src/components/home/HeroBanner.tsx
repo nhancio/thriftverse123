@@ -111,6 +111,8 @@ export function HeroBanner() {
                       <img
                         src={card.image}
                         alt={`${card.line1} ${card.line2}`}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding="async"
                         className="absolute inset-0 w-full h-full object-cover"
                         onError={(e) => {
                           const t = e.target as HTMLImageElement;

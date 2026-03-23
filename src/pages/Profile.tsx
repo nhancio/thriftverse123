@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts, useSavedProducts } from "@/hooks/useProducts";
+import { handleImgError } from "@/lib/constants";
 
 const tabs = [
   { id: "closet", label: "My Listings", icon: Package },
@@ -67,7 +68,20 @@ export default function Profile() {
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
           {avatarUrl ? (
-            <img src={avatarUrl} alt={displayName} className="w-24 h-24 rounded-full" />
+            <img
+              src={avatarUrl}
+              alt={displayName}
+              loading="lazy"
+              decoding="async"
+              className="w-24 h-24 rounded-full"
+              onError={(e) => {
+                const t = e.currentTarget;
+                if (!t.dataset.fallback) {
+                  t.dataset.fallback = "1";
+                  t.style.display = "none";
+                }
+              }}
+            />
           ) : (
             <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
               {displayName.charAt(0).toUpperCase()}
@@ -159,12 +173,18 @@ export default function Profile() {
                   >
                     <Link to={`/product/${product.id}`}>
                       <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-muted mb-2">
-                        <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <img
+                          src={product.images[0]}
+                          alt={product.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={handleImgError}
+                        />
                         <Badge className="absolute top-2 right-2 capitalize">{product.status}</Badge>
                       </div>
                       <h3 className="text-sm font-medium truncate">{product.title}</h3>
-                      <p className="font-semibold">₹{product.price.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">{product.views} views</p>
+                      <p className="font-semibold">{"\u20B9"}{product.price.toLocaleString()}</p>
                     </Link>
                     <Link
                       to={`/sell/edit/${product.id}`}
@@ -199,11 +219,18 @@ export default function Profile() {
                 >
                   <Link to={`/product/${product.id}`}>
                     <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-muted mb-2">
-                      <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <img
+                        src={product.images[0]}
+                        alt={product.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={handleImgError}
+                      />
                       <Badge className="absolute top-2 right-2 capitalize">{product.status}</Badge>
                     </div>
                     <h3 className="text-sm font-medium truncate">{product.title}</h3>
-                    <p className="font-semibold">₹{product.price.toLocaleString()}</p>
+                    <p className="font-semibold">{"\u20B9"}{product.price.toLocaleString()}</p>
                   </Link>
                 </motion.div>
               ))}
@@ -224,16 +251,12 @@ export default function Profile() {
             <h2 className="font-semibold">Your Stats</h2>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-6 rounded-xl bg-muted/30 text-center">
-                <div className="text-3xl font-bold text-primary mb-1">₹0</div>
+                <div className="text-3xl font-bold text-primary mb-1">{"\u20B9"}0</div>
                 <div className="text-sm text-muted-foreground">Total Earnings</div>
               </div>
               <div className="p-6 rounded-xl bg-muted/30 text-center">
                 <div className="text-3xl font-bold mb-1">{products.filter((p) => p.listedByUid === user.id && p.status === "sold").length}</div>
                 <div className="text-sm text-muted-foreground">Items Sold</div>
-              </div>
-              <div className="p-6 rounded-xl bg-muted/30 text-center">
-                <div className="text-3xl font-bold mb-1">{products.filter((p) => p.listedByUid === user.id).reduce((sum, p) => sum + p.views, 0)}</div>
-                <div className="text-sm text-muted-foreground">Total Views</div>
               </div>
             </div>
           </div>

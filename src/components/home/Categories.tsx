@@ -1,29 +1,24 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
+import { handleImgError, PLACEHOLDER_IMG } from "@/lib/constants";
 
-const categories = [
-  {
-    name: "iPhone",
-    slug: "iPhone",
-    image: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800",
-    itemCount: "500+",
-  },
-  {
-    name: "MacBook",
-    slug: "MacBook",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800",
-    itemCount: "250+",
-  },
-  {
-    name: "Watch",
-    slug: "Watch",
-    image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800",
-    itemCount: "180+",
-  },
-];
+const categoryImages: Record<string, string> = {
+  iPhone: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800",
+  MacBook: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800",
+  Watch: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800",
+};
 
 export function Categories() {
+  const { categoryCounts } = useProducts();
+
+  const categories = [
+    { name: "iPhone", slug: "iPhone", image: categoryImages.iPhone },
+    { name: "MacBook", slug: "MacBook", image: categoryImages.MacBook },
+    { name: "Watch", slug: "Watch", image: categoryImages.Watch },
+  ];
+
   return (
     <section className="py-5 sm:py-8 md:py-12 bg-muted/30">
       <div className="container px-3 sm:px-4">
@@ -63,7 +58,10 @@ export function Categories() {
                     <img
                       src={category.image}
                       alt={category.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => handleImgError(e, PLACEHOLDER_IMG)}
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
@@ -72,7 +70,7 @@ export function Categories() {
                       {category.name}
                     </h3>
                     <p className="text-background/70 text-sm">
-                      {category.itemCount} items
+                      {categoryCounts[category.name] ?? 0} items
                     </p>
                   </div>
                 </div>
