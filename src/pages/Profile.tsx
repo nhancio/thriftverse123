@@ -10,6 +10,7 @@ import {
   Plus,
   LogOut,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -18,6 +19,9 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts, useSavedProducts } from "@/hooks/useProducts";
 import { handleImgError } from "@/lib/constants";
+import { deleteProductListing } from "@/lib/supabase-products";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const tabs = [
   { id: "closet", label: "My Listings", icon: Package },
@@ -36,6 +40,19 @@ export default function Profile() {
   const { user, signInWithGoogle, signOut, authError } = useAuth();
   const { products } = useProducts();
   const { savedIds } = useSavedProducts(user?.id);
+  const queryClient = useQueryClient();
+
+  const handleDelete = async (productId: string, title: string) => {
+    if (!user) return;
+    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    const result = await deleteProductListing(productId, user.id);
+    if ("error" in result) {
+      toast.error(result.error);
+    } else {
+      toast.success("Listing deleted");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    }
+  };
   const savedProducts = products.filter((p) => savedIds.includes(p.id));
 
   if (!user) {
@@ -186,13 +203,21 @@ export default function Profile() {
                       <h3 className="text-sm font-medium truncate">{product.title}</h3>
                       <p className="font-semibold">{"\u20B9"}{product.price.toLocaleString()}</p>
                     </Link>
-                    <Link
-                      to={`/sell/edit/${product.id}`}
-                      className="absolute top-2 left-2 rounded-lg bg-background/90 hover:bg-background p-2 shadow-sm border border-border"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Pencil className="w-4 h-4 text-muted-foreground" />
-                    </Link>
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      <Link
+                        to={`/sell/edit/${product.id}`}
+                        className="rounded-lg bg-background/90 hover:bg-background p-2 shadow-sm border border-border"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Pencil className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+                      <button
+                        className="rounded-lg bg-background/90 hover:bg-destructive/10 p-2 shadow-sm border border-border"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(product.id, product.title); }}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </button>
+                    </div>
                   </motion.div>
                 ))}
               </div>

@@ -153,9 +153,6 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
-                <Link to="/sell" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.06]">
-                  Sell
-                </Link>
                 <Link to="/profile?tab=saved" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.06] flex items-center gap-2">
                   <Heart className="w-4 h-4" /> Saved
                 </Link>

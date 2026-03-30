@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Phone } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { LOGO_IMG, handleImgError } from "@/lib/constants";
 
 export function Footer() {
@@ -22,12 +23,20 @@ export function Footer() {
             </p>
             <div className="flex gap-4 mt-6">
               <a
-                href="https://www.instagram.com/thryt.life/"
+                href="https://www.instagram.com/thryft.life/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-background/70 hover:text-primary transition-colors"
               >
                 <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href="https://whatsapp.com/channel/0029VbCLjOqEquiKen9ULZ45"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-background/70 hover:text-primary transition-colors"
+              >
+                <FaWhatsapp className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -61,6 +70,15 @@ export function Footer() {
               >
                 <Phone className="w-3.5 h-3.5" />
                 63044 08747
+              </a>
+              <a
+                href="https://whatsapp.com/channel/0029VbCLjOqEquiKen9ULZ45"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary transition-colors flex items-center gap-1.5"
+              >
+                <FaWhatsapp className="w-3.5 h-3.5" />
+                WhatsApp Channel
               </a>
               <Link to="/about" className="hover:text-primary transition-colors">About</Link>
               <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>

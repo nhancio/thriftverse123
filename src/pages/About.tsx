@@ -9,6 +9,7 @@ import {
   DollarSign,
   Phone,
 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import whatIsThriftImage from "@/assets/what-is-thrift.jpg";
@@ -226,13 +227,24 @@ export default function About() {
           <Phone className="w-10 h-10 mx-auto mb-4 text-primary" />
           <h2 className="text-2xl font-display font-bold mb-2">Get in touch</h2>
           <p className="text-muted-foreground mb-4">Any queries? Please reach out.</p>
-          <a
-            href="tel:7095288950"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:opacity-90 transition-opacity"
-          >
-            <Phone className="w-4 h-4" />
-            Call us: 7095288950
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="tel:7095288950"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:opacity-90 transition-opacity"
+            >
+              <Phone className="w-4 h-4" />
+              Call us: 7095288950
+            </a>
+            <a
+              href="https://whatsapp.com/channel/0029VbCLjOqEquiKen9ULZ45"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] text-white font-semibold shadow-lg shadow-[#25D366]/25 hover:opacity-90 transition-opacity"
+            >
+              <FaWhatsapp className="w-4 h-4" />
+              WhatsApp Channel
+            </a>
+          </div>
         </section>
       </main>
 

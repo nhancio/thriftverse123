@@ -195,6 +195,33 @@ export async function unsaveProduct(userId: string, productId: string): Promise<
   return !error;
 }
 
+/** Delete a product listing. Only the listing owner can delete. */
+export async function deleteProductListing(
+  productId: string,
+  userId: string
+): Promise<{ ok: true } | { error: string }> {
+  const { data: existing, error: fetchErr } = await supabase
+    .from("products")
+    .select("id, listed_by_uid")
+    .eq("id", productId)
+    .single();
+
+  if (fetchErr || !existing) return { error: "Product not found" };
+  if (existing.listed_by_uid !== userId) return { error: "You can only delete your own listings" };
+
+  // Delete saved references first
+  await supabase.from("saved_products").delete().eq("product_id", productId);
+
+  const { error: deleteErr } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId)
+    .eq("listed_by_uid", userId);
+
+  if (deleteErr) return { error: deleteErr.message };
+  return { ok: true };
+}
+
 /** Insert a product listing; listed_by_uid is set from current auth user. */
 export async function insertProductListing(insert: {
   title: string;

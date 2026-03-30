@@ -457,12 +457,21 @@ export default function Sell() {
             </div>
 
             {/* Listing preview after submission */}
-            {showPreview && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <h3 className="text-sm font-medium text-muted-foreground mb-3 text-center">Here's how your listing will look</h3>
-                <ListingPreview />
-              </motion.div>
-            )}
+            <AnimatePresence>
+              {showPreview && (
+                <motion.div
+                  key="listing-preview"
+                  initial={{ opacity: 0, y: 10, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -10, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3 text-center">Here's how your listing will look</h3>
+                  <ListingPreview />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         ) : (
         <>

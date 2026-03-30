@@ -3,7 +3,8 @@ import { Footer } from "@/components/Footer";
 import { HeroBanner } from "@/components/home/HeroBanner";
 import { ProductsSection } from "@/components/home/ProductsSection";
 import { Categories } from "@/components/home/Categories";
-import { Phone } from "lucide-react";
+import { Phone, Instagram } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 const Index = () => {
   return (
@@ -38,6 +39,24 @@ const Index = () => {
               >
                 <Phone className="w-4 h-4" />
                 63044 08747
+              </a>
+              <a
+                href="https://whatsapp.com/channel/0029VbCLjOqEquiKen9ULZ45"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] text-white font-semibold shadow-lg hover:opacity-90 transition-opacity"
+              >
+                <FaWhatsapp className="w-4 h-4" />
+                WhatsApp
+              </a>
+              <a
+                href="https://www.instagram.com/thryft.life/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] text-white font-semibold shadow-lg hover:opacity-90 transition-opacity"
+              >
+                <Instagram className="w-4 h-4" />
+                Instagram
               </a>
             </div>
           </div>
