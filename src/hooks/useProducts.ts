@@ -30,8 +30,15 @@ export function useProducts(): {
   const categoryCounts: Record<string, number> = {
     All: products.length,
     iPhone: products.filter((p) => p.category === "iPhone").length,
+    iPad: products.filter((p) => p.category === "iPad").length,
     MacBook: products.filter((p) => p.category === "MacBook").length,
+    "Mac Mini": products.filter((p) => p.category === "Mac Mini").length,
+    iMac: products.filter((p) => p.category === "iMac").length,
     Watch: products.filter((p) => p.category === "Watch").length,
+    AirPods: products.filter((p) => p.category === "AirPods").length,
+    "iPad Pencil": products.filter((p) => p.category === "iPad Pencil").length,
+    "Apple Hub": products.filter((p) => p.category === "Apple Hub").length,
+    "Apple TV": products.filter((p) => p.category === "Apple TV").length,
   };
 
   return {

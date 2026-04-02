@@ -11,7 +11,7 @@ import { CATEGORY_FILTERS as categories } from "@/types/product";
 import { cn } from "@/lib/utils";
 import { useProducts } from "@/hooks/useProducts";
 
-const VALID_CATEGORIES = ["All", "iPhone", "MacBook", "Watch"];
+const VALID_CATEGORIES = ["All", "iPhone", "iPad", "MacBook", "Mac Mini", "iMac", "Watch", "AirPods", "iPad Pencil", "Apple Hub", "Apple TV"];
 
 export default function Browse() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -59,7 +59,7 @@ export default function Browse() {
           </p>
         </div>
 
-        {/* Filter Bar - iPhone, MacBook, Watch only */}
+        {/* Filter Bar */}
         <div className="flex items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 scrollbar-hide">
           {categories.map((cat) => (
             <Button

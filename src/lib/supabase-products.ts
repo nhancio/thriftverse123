@@ -212,13 +212,15 @@ export async function deleteProductListing(
   // Delete saved references first
   await supabase.from("saved_products").delete().eq("product_id", productId);
 
-  const { error: deleteErr } = await supabase
+  const { data: deletedRows, error: deleteErr } = await supabase
     .from("products")
     .delete()
+    .select("id")
     .eq("id", productId)
     .eq("listed_by_uid", userId);
 
   if (deleteErr) return { error: deleteErr.message };
+  if (!deletedRows?.length) return { error: "Delete failed. Check product delete policy in Supabase." };
   return { ok: true };
 }
 

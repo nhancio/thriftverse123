@@ -55,6 +55,13 @@ export interface Collection {
 export const CATEGORY_FILTERS = [
   { name: "All", count: 0 },
   { name: "iPhone", count: 0 },
+  { name: "iPad", count: 0 },
   { name: "MacBook", count: 0 },
+  { name: "Mac Mini", count: 0 },
+  { name: "iMac", count: 0 },
   { name: "Watch", count: 0 },
+  { name: "AirPods", count: 0 },
+  { name: "iPad Pencil", count: 0 },
+  { name: "Apple Hub", count: 0 },
+  { name: "Apple TV", count: 0 },
 ] as const;

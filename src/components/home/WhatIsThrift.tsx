@@ -33,9 +33,9 @@ export function WhatIsThrift() {
                   The Thryft Story
                 </p>
                 <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                  Someone <span className="font-semibold text-foreground">bought it</span>, wore it once, forgot about it.
+                  Someone <span className="font-semibold text-foreground">bought it</span>, used it once, forgot about it.
                   <br />
-                  You find it. You style it. You own it.
+                  You find it. You own it.
                 </p>
                 <p className="mt-4 text-base md:text-lg leading-relaxed">
                   Why pay{" "}

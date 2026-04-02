@@ -6,8 +6,15 @@ import { handleImgError, PLACEHOLDER_IMG } from "@/lib/constants";
 
 const categoryImages: Record<string, string> = {
   iPhone: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800",
+  iPad: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800",
   MacBook: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800",
+  "Mac Mini": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
+  iMac: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
   Watch: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800",
+  AirPods: "https://images.unsplash.com/photo-1588156979435-379b9d802b0e?w=800",
+  "iPad Pencil": "https://images.unsplash.com/photo-1587033411391-5d9e51cce126?w=800",
+  "Apple Hub": "https://images.unsplash.com/photo-1543512214-318c7553f230?w=800",
+  "Apple TV": "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800",
 };
 
 export function Categories() {
@@ -15,8 +22,15 @@ export function Categories() {
 
   const categories = [
     { name: "iPhone", slug: "iPhone", image: categoryImages.iPhone },
+    { name: "iPad", slug: "iPad", image: categoryImages.iPad },
     { name: "MacBook", slug: "MacBook", image: categoryImages.MacBook },
+    { name: "Mac Mini", slug: "Mac Mini", image: categoryImages["Mac Mini"] },
+    { name: "iMac", slug: "iMac", image: categoryImages.iMac },
     { name: "Watch", slug: "Watch", image: categoryImages.Watch },
+    { name: "AirPods", slug: "AirPods", image: categoryImages.AirPods },
+    { name: "iPad Pencil", slug: "iPad Pencil", image: categoryImages["iPad Pencil"] },
+    { name: "Apple Hub", slug: "Apple Hub", image: categoryImages["Apple Hub"] },
+    { name: "Apple TV", slug: "Apple TV", image: categoryImages["Apple TV"] },
   ];
 
   return (
@@ -40,7 +54,7 @@ export function Categories() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {categories.map((category, index) => (
             <motion.div
               key={category.slug}

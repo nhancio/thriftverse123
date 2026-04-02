@@ -48,8 +48,15 @@ export function Footer() {
               <Link to="/browse" className="hover:text-primary transition-colors">Browse All</Link>
               <Link to="/categories" className="hover:text-primary transition-colors">Categories</Link>
               <Link to="/browse?category=iPhone" className="hover:text-primary transition-colors">iPhone</Link>
+              <Link to="/browse?category=iPad" className="hover:text-primary transition-colors">iPad</Link>
               <Link to="/browse?category=MacBook" className="hover:text-primary transition-colors">MacBook</Link>
+              <Link to="/browse?category=Mac Mini" className="hover:text-primary transition-colors">Mac Mini</Link>
+              <Link to="/browse?category=iMac" className="hover:text-primary transition-colors">iMac</Link>
               <Link to="/browse?category=Watch" className="hover:text-primary transition-colors">Watch</Link>
+              <Link to="/browse?category=AirPods" className="hover:text-primary transition-colors">AirPods</Link>
+              <Link to="/browse?category=iPad Pencil" className="hover:text-primary transition-colors">iPad Pencil</Link>
+              <Link to="/browse?category=Apple Hub" className="hover:text-primary transition-colors">Apple Hub</Link>
+              <Link to="/browse?category=Apple TV" className="hover:text-primary transition-colors">Apple TV</Link>
             </nav>
           </div>
 

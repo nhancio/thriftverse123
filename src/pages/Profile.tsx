@@ -45,8 +45,17 @@ export default function Profile() {
   const handleDelete = async (productId: string, title: string) => {
     if (!user) return;
     if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
+
+    await queryClient.cancelQueries({ queryKey: ["products"] });
+    const previousProducts = queryClient.getQueryData<typeof products>(["products"]);
+    queryClient.setQueryData<typeof products>(["products"], (current = []) =>
+      current.filter((product) => product.id !== productId)
+    );
+    queryClient.removeQueries({ queryKey: ["product", productId], exact: true });
+
     const result = await deleteProductListing(productId, user.id);
     if ("error" in result) {
+      queryClient.setQueryData(["products"], previousProducts);
       toast.error(result.error);
     } else {
       toast.success("Listing deleted");

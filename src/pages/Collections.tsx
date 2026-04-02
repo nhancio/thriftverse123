@@ -6,11 +6,19 @@ import { Footer } from "@/components/Footer";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/ProductCard";
 import { CATEGORY_FILTERS } from "@/types/product";
+import { handleImgError, PLACEHOLDER_IMG } from "@/lib/constants";
 
 const CATEGORY_IMAGES: Record<string, string> = {
   iPhone: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800",
+  iPad: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800",
   MacBook: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800",
+  "Mac Mini": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
+  iMac: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
   Watch: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800",
+  AirPods: "https://images.unsplash.com/photo-1588156979435-379b9d802b0e?w=800",
+  "iPad Pencil": "https://images.unsplash.com/photo-1587033411391-5d9e51cce126?w=800",
+  "Apple Hub": "https://images.unsplash.com/photo-1543512214-318c7553f230?w=800",
+  "Apple TV": "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800",
 };
 
 const Collections = () => {
@@ -33,7 +41,7 @@ const Collections = () => {
               Categories
             </h1>
             <p className="text-muted-foreground text-lg">
-              Browse by category. iPhone, MacBook, Watch and more.
+              Browse by category. iPhone, iPad, MacBook, Mac Mini, iMac, Watch, AirPods, iPad Pencil, Apple Hub, Apple TV and more.
             </p>
           </motion.div>
         </div>
@@ -42,7 +50,7 @@ const Collections = () => {
       {/* Categories Grid - from Supabase counts */}
       <section className="pb-16">
         <div className="container">
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
             {categoryCards.map((cat, i) => (
               <motion.div
                 key={cat.name}
@@ -58,6 +66,7 @@ const Collections = () => {
                     src={CATEGORY_IMAGES[cat.name] ?? ""}
                     alt={cat.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={(e) => handleImgError(e, PLACEHOLDER_IMG)}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">

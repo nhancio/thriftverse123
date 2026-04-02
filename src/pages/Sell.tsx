@@ -39,12 +39,19 @@ const steps = [
   { id: 5, title: "Publish", description: "Review & list" },
 ];
 
-const categories = ["iPhone", "MacBook", "Watch"];
+const categories = ["iPhone", "iPad", "MacBook", "Mac Mini", "iMac", "Watch", "AirPods", "iPad Pencil", "Apple Hub", "Apple TV"];
 const conditions = ["New with tags", "New", "Like new", "Gently used", "Worn"];
 const sizes = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
 const iphoneSizes = ["64GB", "128GB", "256GB", "512GB", "1TB"];
-const macbookSizes = ["128GB", "256GB", "512GB", "1TB", "2TB"];
+const ipadSizes = ["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"];
+const macbookSizes = ["256GB", "512GB", "1TB", "2TB", "4TB"];
 const watchSizes = ["38mm", "40mm", "41mm", "44mm", "45mm", "49mm"];
+const airpodsModels = ["AirPods 2", "AirPods 3", "AirPods 4", "AirPods Pro", "AirPods Pro 2", "AirPods Max"];
+const pencilModels = ["Apple Pencil USB-C", "Apple Pencil 1st Gen", "Apple Pencil 2nd Gen", "Apple Pencil Pro"];
+const macMiniModels = ["M1", "M2", "M2 Pro", "M4", "M4 Pro"];
+const imacModels = ['24"', '27"', "M1", "M3", "M4"];
+const appleHubModels = ["HomePod mini", "HomePod 2nd Gen", "AirPort Express", "AirPort Extreme"];
+const appleTvModels = ["Apple TV HD", "Apple TV 4K 1st Gen", "Apple TV 4K 2nd Gen", "Apple TV 4K 3rd Gen"];
 // eras removed per user request
 
 export default function Sell() {
@@ -75,11 +82,19 @@ export default function Sell() {
     storage: "",
     model: "",
     batteryHealth: "",
+    // iPad
+    ipadChip: "",
+    ipadCellular: "",
     // MacBook
     ram: "",
     chip: "",
     // Watch
     cellular: "",
+    // AirPods
+    caseType: "",
+    noiseCancellation: "",
+    // iPad Pencil
+    pencilCondition: "",
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,9 +122,14 @@ export default function Sell() {
       storage: "",
       model: "",
       batteryHealth: "",
+      ipadChip: "",
+      ipadCellular: "",
       ram: "",
       chip: "",
       cellular: "",
+      caseType: "",
+      noiseCancellation: "",
+      pencilCondition: "",
     });
     setPhotoEntries(
       existingProduct.images?.length
@@ -268,14 +288,53 @@ export default function Sell() {
       storage: "",
       model: "",
       batteryHealth: "",
+      ipadChip: "",
+      ipadCellular: "",
       ram: "",
       chip: "",
       cellular: "",
+      caseType: "",
+      noiseCancellation: "",
+      pencilCondition: "",
     });
   };
 
   // Derived preview URLs for rendering (keeps JSX clean)
   const photos = photoEntries.map((e) => e.previewUrl);
+  const sizeLabel =
+    formData.category === "Watch"
+      ? "Case size"
+      : formData.category === "AirPods"
+        ? "Model"
+        : formData.category === "iPad Pencil"
+          ? "Model"
+        : formData.category === "Mac Mini" || formData.category === "iMac" || formData.category === "Apple Hub" || formData.category === "Apple TV"
+          ? "Model"
+        : formData.category === "iPhone" || formData.category === "iPad" || formData.category === "MacBook"
+          ? "Storage"
+          : "Size";
+  const sizeOptions =
+    formData.category === "iPhone"
+      ? iphoneSizes
+      : formData.category === "iPad"
+        ? ipadSizes
+      : formData.category === "MacBook"
+          ? macbookSizes
+          : formData.category === "Mac Mini"
+            ? macMiniModels
+            : formData.category === "iMac"
+              ? imacModels
+          : formData.category === "Watch"
+            ? watchSizes
+            : formData.category === "AirPods"
+              ? airpodsModels
+              : formData.category === "iPad Pencil"
+                ? pencilModels
+                : formData.category === "Apple Hub"
+                  ? appleHubModels
+                  : formData.category === "Apple TV"
+                    ? appleTvModels
+              : sizes;
 
   /* ── Listing Preview Card (reused in step 5 and confirmation) ── */
   const ListingPreview = ({ compact = false }: { compact?: boolean }) => (
@@ -319,9 +378,14 @@ export default function Sell() {
           {formData.size && <Badge variant="secondary" className="text-xs">{formData.size}</Badge>}
           {formData.condition && <Badge variant="secondary" className="text-xs">{formData.condition}</Badge>}
           {formData.chip && <Badge variant="secondary" className="text-xs">{formData.chip}</Badge>}
+          {formData.ipadChip && <Badge variant="secondary" className="text-xs">{formData.ipadChip}</Badge>}
           {formData.ram && <Badge variant="secondary" className="text-xs">{formData.ram} RAM</Badge>}
           {formData.batteryHealth && <Badge variant="secondary" className="text-xs">Battery {formData.batteryHealth}%</Badge>}
           {formData.cellular && <Badge variant="secondary" className="text-xs">Cellular: {formData.cellular}</Badge>}
+          {formData.ipadCellular && <Badge variant="secondary" className="text-xs">Cellular: {formData.ipadCellular}</Badge>}
+          {formData.caseType && <Badge variant="secondary" className="text-xs">{formData.caseType}</Badge>}
+          {formData.noiseCancellation && <Badge variant="secondary" className="text-xs">ANC: {formData.noiseCancellation}</Badge>}
+          {formData.pencilCondition && <Badge variant="secondary" className="text-xs">{formData.pencilCondition}</Badge>}
         </div>
         {!compact && formData.description && (
           <p className="text-sm text-muted-foreground mt-3 line-clamp-3">{formData.description}</p>
@@ -610,7 +674,7 @@ export default function Sell() {
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Item + Key detail (e.g., MacBook Pro M1 2020 256GB)"
+                    placeholder="Item + key detail (e.g., iPad Air M1 256GB or Apple Pencil Pro)"
                     className="w-full h-12 px-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                   <p className="text-xs text-muted-foreground mt-1">{formData.title.length}/80 characters</p>
@@ -618,18 +682,9 @@ export default function Sell() {
 
                 {/* Size - dynamic by category */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {formData.category === "iPhone" ? "Storage" : formData.category === "MacBook" ? "Storage" : formData.category === "Watch" ? "Case size" : "Size"} *
-                  </label>
+                  <label className="block text-sm font-medium mb-2">{sizeLabel} *</label>
                   <div className="flex flex-wrap gap-2">
-                    {(formData.category === "iPhone"
-                      ? iphoneSizes
-                      : formData.category === "MacBook"
-                        ? macbookSizes
-                        : formData.category === "Watch"
-                          ? watchSizes
-                          : sizes
-                    ).map((size) => (
+                    {sizeOptions.map((size) => (
                       <Button
                         key={size}
                         variant={formData.size === size ? "default" : "tag"}
@@ -654,6 +709,29 @@ export default function Sell() {
                       className="w-full h-12 px-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
+                )}
+
+                {/* iPad-specific */}
+                {formData.category === "iPad" && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Chip</label>
+                      <input
+                        type="text"
+                        value={formData.ipadChip}
+                        onChange={(e) => setFormData({ ...formData, ipadChip: e.target.value })}
+                        placeholder="e.g. A14 Bionic, M1, M2, M4"
+                        className="w-full h-12 px-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Cellular?</label>
+                      <div className="flex gap-2">
+                        <Button variant={formData.ipadCellular === "Yes" ? "default" : "tag"} size="sm" onClick={() => setFormData({ ...formData, ipadCellular: "Yes" })}>Yes</Button>
+                        <Button variant={formData.ipadCellular === "No" ? "default" : "tag"} size="sm" onClick={() => setFormData({ ...formData, ipadCellular: "No" })}>No</Button>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 {/* MacBook-specific */}
@@ -689,6 +767,53 @@ export default function Sell() {
                     <div className="flex gap-2">
                       <Button variant={formData.cellular === "Yes" ? "default" : "tag"} size="sm" onClick={() => setFormData({ ...formData, cellular: "Yes" })}>Yes</Button>
                       <Button variant={formData.cellular === "No" ? "default" : "tag"} size="sm" onClick={() => setFormData({ ...formData, cellular: "No" })}>No</Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* AirPods-specific */}
+                {formData.category === "AirPods" && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Case type</label>
+                      <div className="flex flex-wrap gap-2">
+                        {["Lightning", "USB-C", "Wireless", "No case"].map((type) => (
+                          <Button
+                            key={type}
+                            variant={formData.caseType === type ? "default" : "tag"}
+                            size="sm"
+                            onClick={() => setFormData({ ...formData, caseType: type })}
+                          >
+                            {type}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Noise cancellation</label>
+                      <div className="flex gap-2">
+                        <Button variant={formData.noiseCancellation === "Yes" ? "default" : "tag"} size="sm" onClick={() => setFormData({ ...formData, noiseCancellation: "Yes" })}>Yes</Button>
+                        <Button variant={formData.noiseCancellation === "No" ? "default" : "tag"} size="sm" onClick={() => setFormData({ ...formData, noiseCancellation: "No" })}>No</Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* iPad Pencil-specific */}
+                {formData.category === "iPad Pencil" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Accessory condition</label>
+                    <div className="flex flex-wrap gap-2">
+                      {["With box", "Without box", "Extra tips included", "Engraved"].map((value) => (
+                        <Button
+                          key={value}
+                          variant={formData.pencilCondition === value ? "default" : "tag"}
+                          size="sm"
+                          onClick={() => setFormData({ ...formData, pencilCondition: value })}
+                        >
+                          {value}
+                        </Button>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -811,7 +936,7 @@ export default function Sell() {
                     { done: photos.length >= 3, text: `${photos.length} photos added (min 3)` },
                     { done: !!formData.title, text: "Title added" },
                     { done: !!formData.category, text: "Category selected" },
-                    { done: !!formData.size, text: `${formData.category === "Watch" ? "Case size" : "Storage"} selected` },
+                    { done: !!formData.size, text: `${sizeLabel} selected` },
                     { done: !!formData.condition, text: "Condition set" },
                     { done: !!formData.price, text: `Price set — ₹${Number(formData.price || 0).toLocaleString()}` },
                   ].map((item, i) => (

@@ -36,7 +36,7 @@ export default function Terms() {
               <li>Sellers must include clear photos showing the actual condition of items.</li>
               <li>Listings are subject to verification before going live.</li>
               <li>Thryft reserves the right to remove listings that violate our policies.</li>
-              <li>Product categories are limited to iPhone, MacBook, and Watch.</li>
+              <li>Product categories are limited to iPhone, iPad, MacBook, Mac Mini, iMac, Watch, AirPods, iPad Pencil, Apple Hub, and Apple TV.</li>
             </ul>
           </section>
 
